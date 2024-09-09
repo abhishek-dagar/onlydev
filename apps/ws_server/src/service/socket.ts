@@ -7,7 +7,6 @@ class SocketService {
   constructor() {
     this._io = new Server({
       cors: {
-        allowedHeaders: ["*"],
         origin: "*",
       },
     });
