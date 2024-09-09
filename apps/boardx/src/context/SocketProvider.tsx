@@ -23,7 +23,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = useState<Socket>();
 
   useEffect(() => {
-    const _socket = io(process.env.WS_URL || "http://localhost:3000");
+    const _socket = io(process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3000");
+    console.log(process.env.NEXT_PUBLIC_WS_URL);
+    
     // _socket.on("message", onMessageRec);
 
     setSocket(_socket);
