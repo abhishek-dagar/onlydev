@@ -1,9 +1,8 @@
-import { Button } from "@repo/ui/components/ui/button";
+import { currentUser } from "@repo/ui/lib/helpers/getTokenData";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <div>
-      <Button variant={"destructive"}>Click me</Button>
-    </div>
-  );
+export default async function Home() {
+  const user: any = await currentUser();
+  if (user) redirect("/app/dashboard");
+  redirect("/signin");
 }
