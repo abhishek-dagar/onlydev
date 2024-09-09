@@ -71,14 +71,14 @@ const InvitationModel = ({ user }: { user: UserType }) => {
     }
   };
 
-  const rejectInvite = async(invite: InvitationType) => {
+  const rejectInvite = async (invite: InvitationType) => {
     const res = await removeInvitation(invite.id);
     if (res.invitation) {
       socket?.emit("notification", { roomId: res.invitation.fromUserId });
       getInvitations();
       router.refresh();
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

@@ -14,12 +14,14 @@ import "./index.css";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@repo/ui/lib/utils";
 import { fetchBoardWorkspaces } from "@/lib/actions/board-workspace.action";
+import { useSocket } from "@/context/SocketProvider";
 
 const SideBar = ({ user }: { user: UserType }) => {
   const [boardWorkspaces, setBoardWorkspaces] = useState<BoardWorkspacesType[]>(
     []
   );
   const searchParams = useSearchParams();
+  const { socket } = useSocket();
 
   const addWorkspace = (newWorkspace: BoardWorkspacesType) => {
     setBoardWorkspaces([...boardWorkspaces, newWorkspace]);
@@ -34,6 +36,17 @@ const SideBar = ({ user }: { user: UserType }) => {
   useEffect(() => {
     getBoardWorkspaces();
   }, [user.id]);
+  useEffect(() => {
+    if (socket && user) {
+      socket.emit("connect-notification", { roomId: user.id });
+      socket.on("notification", () => {
+        getBoardWorkspaces();
+      });
+      return () => {
+        socket.off("notification");
+      };
+    }
+  }, [user.id, socket]);
   return (
     <nav className="h-screen overflow-auto justify-between flex items-center flex-col gap-10 px-2 min-w-16 w-16 border-r relative no-slide-bar">
       <div className="flex items-center justify-center flex-col gap-8">

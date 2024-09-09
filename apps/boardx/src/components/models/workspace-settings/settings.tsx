@@ -11,6 +11,7 @@ import { BoardWorkspacesType } from "@repo/ui/lib/types/board-workspace.types";
 import { cn } from "@repo/ui/lib/utils";
 import { PencilLineIcon, WholeWordIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { withRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -37,8 +38,11 @@ const Settings = ({
       setWorkspace(undefined);
       setIsOpen(false);
       socket?.emit("notification", {
-        roomId: res.boardWorkspace.members.map((member: any) => member.id),
+        roomId: res.boardWorkspace.members
+          .map((member: any) => member.id)
+          .push(res.boardWorkspace.userId),
       });
+      router.refresh();
       return {
         success: "Workspace deleted successfully",
         err: undefined,
@@ -53,7 +57,7 @@ const Settings = ({
   const handleUpdate = async () => {
     setIsLoading(true);
     const res = await updateBoardWorkspace({
-      ...workspace,
+      id: workspace.id,
       name,
     });
     if (res.boardWorkspace) {
