@@ -40,7 +40,7 @@ const Member = ({
   useEffect(() => {
     if (socket) {
       socket.emit("connect-notification", { roomId: user.id });
-      socket.on("notification", (data) => {
+      socket.on("notification", () => {
         getInvitedMembers();
         getMembers();
       });

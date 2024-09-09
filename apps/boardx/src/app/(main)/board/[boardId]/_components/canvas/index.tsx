@@ -28,7 +28,7 @@ import { useSocket } from "@/context/SocketProvider";
 import { UserType } from "@repo/ui/lib/types/user.types";
 import { CursorsPresence } from "../cursor-presence";
 import { Participants } from "../participants";
-import { fetchBoardById, updateBoard } from "@/lib/actions/board.action";
+import { updateBoard } from "@/lib/actions/board.action";
 import { BoardType } from "@repo/ui/lib/types/bards.type";
 import { Path } from "../layer-components/path";
 
@@ -96,7 +96,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   // Handle undo operation
   const handleUndo = useCallback(() => {
     if (canUndo()) {
-      let updatedHistory = JSON.parse(JSON.stringify(history));
+      const updatedHistory = JSON.parse(JSON.stringify(history));
       updatedHistory[historyIndex] = layers;
       setHistory(updatedHistory);
       setLayers(history[historyIndex]); // Set the layers to the previous state

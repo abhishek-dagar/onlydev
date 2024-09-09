@@ -7,10 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
+import { Suspense } from "react";
 
-type Props = {};
-
-const SignIn = (props: Props) => {
+const SignIn = () => {
   return (
     <Card className="flex flex-col items-center justify-center min-w-full md:min-w-[450px] rounded-xl">
       <CardHeader className="flex flex-col items-center justify-center">
@@ -20,7 +19,9 @@ const SignIn = (props: Props) => {
         <CardDescription>Sign up to project planit</CardDescription>
       </CardHeader>
       <CardContent className="w-full">
-        <SignInForm />
+        <Suspense>
+          <SignInForm />
+        </Suspense>
       </CardContent>
     </Card>
   );

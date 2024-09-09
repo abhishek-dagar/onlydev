@@ -1,7 +1,6 @@
 import AddBoardModel from "@/components/models/add-board-model";
 import { Button } from "@repo/ui/components/ui/button";
 import Image from "next/image";
-import React from "react";
 
 const EmptyOrg = ({ user }: { user: any }) => {
   return (

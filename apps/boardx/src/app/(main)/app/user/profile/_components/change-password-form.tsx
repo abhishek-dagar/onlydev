@@ -76,10 +76,10 @@ export function ChangePasswordForm({
     }
   }
 
-  useEffect(() => {
-    if (localStorage.getItem("email"))
-      changePasswordForm.setValue("email", localStorage.getItem("email")!);
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem("email"))
+  //     changePasswordForm.setValue("email", localStorage.getItem("email")!);
+  // }, []);
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>

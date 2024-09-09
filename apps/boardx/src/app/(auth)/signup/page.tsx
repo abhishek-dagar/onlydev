@@ -8,9 +8,7 @@ import {
   CardTitle,
 } from "@repo/ui/components/ui/card";
 
-type Props = {};
-
-const SignUp = (props: Props) => {
+const SignUp = () => {
   return (
     <Card className="flex flex-col items-center justify-center min-w-full md:min-w-[450px] rounded-xl">
       <CardHeader className="flex flex-col items-center justify-center">

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { pusherServer } from "@/lib/pusher";
 
 export async function POST(request: NextRequest) {
   const req = await request.json();
@@ -23,7 +22,5 @@ export async function POST(request: NextRequest) {
       isOnline: req.status,
     },
   });
-  
-  pusherServer.trigger(data.id, "user-status", req.status);
   return response;
 }

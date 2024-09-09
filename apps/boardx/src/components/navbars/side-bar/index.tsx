@@ -12,7 +12,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import "./index.css";
 import { useSearchParams } from "next/navigation";
-import { currentUser } from "@repo/ui/lib/helpers/getTokenData";
 import { cn } from "@repo/ui/lib/utils";
 import { fetchBoardWorkspaces } from "@/lib/actions/board-workspace.action";
 

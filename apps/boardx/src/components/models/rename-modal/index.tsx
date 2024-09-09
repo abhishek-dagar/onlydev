@@ -27,7 +27,7 @@ const RenameModal = forwardRef(
       children?: React.ReactNode;
       updateBoardData: (data: BoardType) => void;
     },
-    ref
+    _
   ) => {
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState(board.name);
@@ -81,5 +81,7 @@ const RenameModal = forwardRef(
     );
   }
 );
+
+RenameModal.displayName = "RenameModal";
 
 export default RenameModal;

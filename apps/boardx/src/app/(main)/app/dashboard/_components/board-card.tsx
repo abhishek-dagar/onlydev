@@ -1,5 +1,4 @@
 import { BoardType } from "@repo/ui/lib/types/bards.type";
-import { BoardWorkspacesType } from "@repo/ui/lib/types/board-workspace.types";
 import { cn } from "@repo/ui/lib/utils";
 import { MoreHorizontalIcon, StarIcon } from "lucide-react";
 import Image from "next/image";

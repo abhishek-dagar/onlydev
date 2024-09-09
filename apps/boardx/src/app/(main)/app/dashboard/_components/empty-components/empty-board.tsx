@@ -1,11 +1,7 @@
 "use client";
 
 import { Button } from "@repo/ui/components/ui/button";
-import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React from "react";
-import { toast } from "sonner";
 
 const EmptyBoard = ({ createBoard }: { createBoard: () => void }) => {
   return (

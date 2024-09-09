@@ -6,9 +6,8 @@ import { currentUser } from "@repo/ui/lib/helpers/getTokenData";
 import SettingsSubSection from "./_components/settings-sub-section";
 import { ChangePasswordForm } from "./_components/change-password-form";
 
-type Props = {};
 
-const ProfileSettings = async (props: Props) => {
+const ProfileSettings = async () => {
   const user = await currentUser();
   if (!user) redirect("/signin");
   return (

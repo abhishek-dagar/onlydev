@@ -66,6 +66,7 @@ const ListBoards = ({ user }: { user: UserType }) => {
   React.useEffect(() => {
     getBoards();
   }, [searchParams, searchParams.get("workspaceId")]);
+  
   return (
     <>
       <DashboardTopBar

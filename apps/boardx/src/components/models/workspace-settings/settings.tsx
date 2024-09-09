@@ -9,7 +9,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { BoardWorkspacesType } from "@repo/ui/lib/types/board-workspace.types";
 import { cn } from "@repo/ui/lib/utils";
-import { PencilIcon, PencilLineIcon, WholeWordIcon } from "lucide-react";
+import { PencilLineIcon, WholeWordIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

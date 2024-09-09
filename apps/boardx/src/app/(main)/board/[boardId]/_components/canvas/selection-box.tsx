@@ -1,8 +1,7 @@
 "use client";
 
 import {
-  boundingBox,
-  useSelectionBounds,
+  boundingBox
 } from "@/components/custom-hooks/use-selection-bounds";
 // import { useSelectionBounds } from "@/hooks/use-selection-bounds";
 // import { useSelf, useStorage } from "@/liveblocks.config";

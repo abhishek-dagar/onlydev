@@ -1,6 +1,3 @@
-import { currentUser } from "@repo/ui/lib/helpers/getTokenData";
-import { UserType } from "@repo/ui/lib/types/user.types";
-import { redirect } from "next/navigation";
 
 export default async function AppLayout({
   children,
