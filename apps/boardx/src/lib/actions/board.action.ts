@@ -61,7 +61,7 @@ export const fetchBoards = async (workspaceId: string) => {
   }
 };
 
-export const fetchBoardById = async (boardId: string, userId: String) => {
+export const fetchBoardById = async (boardId: string, userId: string) => {
   "use server";
   try {
     const board = await db.board.findUnique({
