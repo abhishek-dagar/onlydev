@@ -43,7 +43,7 @@ interface CanvasProps {
 const Canvas = ({ boardId, board, user }: CanvasProps) => {
   const [canvasState, setCanvasState] = useState<CanvasState>({
     mode: CanvasMode.None,
-  });
+  });  
 
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
   const [myPresence, setMyPresence] = useState<MyPresenceType>({
@@ -51,10 +51,16 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   });
   const [layerIds, setLayerIds] = useState<string[]>([]);
   const [layers, setLayers] = useState<{ [key: string]: Layer }>({});
-  const [lastUsedColor, setLastUsedColor] = useState<Color>({
-    r: 255,
-    g: 255,
-    b: 255,
+  const [lastUsedValues, setLastUsedValues] = useState<{
+    fillColor: Color | string;
+    strokeColor: Color | string;
+    strokeWidth: number;
+    rx: number;
+  }>({
+    fillColor: "#fff",
+    strokeColor: "#fff",
+    strokeWidth: 1,
+    rx: 5,
   });
   const [cursors, setCursors] = useState<Record<string, Point>>({});
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
@@ -63,20 +69,29 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const { socket } = useSocket();
 
-  const trackHistory = () => {
+  const trackHistory = (previousLayer: { [key: string]: Layer }) => {
     setHistory((prev) => {
       // Check if last history is the same as the current layers state
-      if (JSON.stringify(prev[historyIndex]) === JSON.stringify(layers)) {
+      if (
+        JSON.stringify(prev[historyIndex]) === JSON.stringify(previousLayer)
+      ) {
         return prev; // No need to update if nothing has changed
       }
 
       // Remove all entries after the current index to ensure proper redo functionality
-      const newHistory = prev.slice(0, historyIndex + 1);
+      const newHistory = prev;
+      if (
+        historyIndex > -1 &&
+        historyIndex + 1 < newHistory.length - 1 &&
+        JSON.stringify(prev[historyIndex + 1]) !== JSON.stringify(previousLayer)
+      ) {
+        newHistory.splice(historyIndex + 1);
+      }
 
       // Add the current state of layers to the history
       const updatedHistory = [
         ...newHistory,
-        JSON.parse(JSON.stringify(layers)),
+        JSON.parse(JSON.stringify(previousLayer)),
       ];
 
       // Keep only the last 10 entries
@@ -92,14 +107,13 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   // Undo and redo boundary checks
   const canUndo = () => historyIndex >= 0;
   const canRedo = () => historyIndex < history.length - 1;
-
   // Handle undo operation
   const handleUndo = useCallback(() => {
+    console.log(historyIndex);
+
     if (canUndo()) {
-      const updatedHistory = JSON.parse(JSON.stringify(history));
-      updatedHistory[historyIndex] = layers;
-      setHistory(updatedHistory);
       setLayers(history[historyIndex]); // Set the layers to the previous state
+      updateDBboardLayers(history[historyIndex], false);
       setLayerIds(
         Object.keys(history[historyIndex]).map((key) => key.toString())
       );
@@ -109,17 +123,24 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
 
   // Handle redo operation
   const handleRedo = useCallback(() => {
+    console.log(historyIndex);
+
     if (canRedo()) {
-      setLayers(history[historyIndex + 1]); // Set the layers to the next state
+      let updatedIndex = historyIndex + 1;
+      if (updatedIndex === 0 && history.length > 1) {
+        updatedIndex++;
+      }
+      setLayers(history[updatedIndex]); // Set the layers to the next state
+      updateDBboardLayers(history[updatedIndex], false);
       setLayerIds(
-        Object.keys(history[historyIndex + 1]).map((key) => key.toString())
+        Object.keys(history[updatedIndex]).map((key) => key.toString())
       );
-      setHistoryIndex((prev) => prev + 1); // Move the history index forward
+      setHistoryIndex(updatedIndex); // Move the history index forward
     }
   }, [history, historyIndex]);
 
   // React.useEffect(() => {
-  //   console.log(history[historyIndex]);
+  //   console.log(history, historyIndex);
   // }, [history, historyIndex]);
   const updateBoardData = async (data: any) => {
     if (data.userId === user.id) return;
@@ -164,15 +185,32 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     );
   }, []);
 
-  const updateDBboardLayers = async () => {
-    await updateBoard({ id: boardId, layers: Object.values(layers) });
+  const updateDBboardLayers = async (
+    updatedLayers: {
+      [key: string]: Layer;
+    },
+    isTrackHistory: boolean = true
+  ) => {
+    const res = await updateBoard({
+      id: boardId,
+      layers: Object.values(updatedLayers),
+    });
+    if (res.previousBoard && isTrackHistory) {
+      const previousLayers: any = res.previousBoard.layers.reduce(
+        (acc: any, layer: any, index: number) => {
+          acc[(index + 1).toString()] = layer;
+          return acc;
+        },
+        {}
+      );
+      trackHistory(previousLayers);
+    }
   };
 
-  React.useEffect(() => {
-    // console.log(layers);
-
-    updateDBboardLayers();
-  }, [layers]);
+  // React.useEffect(() => {
+  //   // console.log(layers);
+  //   updateDBboardLayers();
+  // }, [layers]);
 
   React.useEffect(() => {
     if (socket) {
@@ -194,14 +232,44 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     }
   }, [socket]);
 
+  const duplicateLayer = useCallback(() => {
+    let count: number = layerIds.length;
+    const newLayerIds: string[] = [];
+    const newLayers: { [key: string]: Layer } = {};
+    for (const layerId of myPresence.selectedLayers) {
+      count++;
+      const layer = layers[layerId];
+      newLayers[count.toString()] = {
+        ...layer,
+        x: layer.x + 10,
+        y: layer.y + 10,
+      };
+      newLayerIds.push(count.toString());
+      updateLiveBoardData({
+        layers: {
+          ...layers,
+          [layerId]: layer,
+        },
+      });
+    }
+
+    setLayerIds((prev) => [...prev, ...newLayerIds]);
+    setLayers((prev) => ({
+      ...prev,
+      ...newLayers,
+    }));
+    updateDBboardLayers({
+      ...layers,
+      ...newLayers,
+    });
+    setMyPresence({ selectedLayers: newLayerIds });
+  }, [myPresence.selectedLayers, layers, layerIds]);
+
   const updateLayers = useCallback(
     (key: string, layer: Layer) => {
       updateLiveBoardData({
         layers: { ...layers, [key]: layer },
       });
-      if (layers[key].fill !== layer.fill) {
-        trackHistory();
-      }
       setLayers((prev) => ({ ...prev, [key]: layer }));
     },
     [layers]
@@ -312,13 +380,16 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         type: layerType,
         x: position.x,
         y: position.y,
+        rx: lastUsedValues.rx,
+        stroke: lastUsedValues.strokeColor,
+        strokeWidth: lastUsedValues.strokeWidth,
         height: 100,
         width: 100,
-        fill: lastUsedColor,
+        fill: lastUsedValues.fillColor,
       };
 
       setLayerIds((prev) => [...prev, layerId]);
-      trackHistory();
+      // trackHistory();
       setLayers((prev) => ({
         ...prev,
         [layerId]: layer,
@@ -331,8 +402,9 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
 
       setMyPresence({ ...myPresence, selectedLayers: [layerId] });
       setCanvasState({ mode: CanvasMode.None });
+      updateDBboardLayers({ ...layers, [layerId]: layer });
     },
-    [layerIds, lastUsedColor, layers, myPresence]
+    [layerIds, lastUsedValues.fillColor, layers, myPresence]
   );
 
   const deleteLayer = useCallback(() => {
@@ -346,10 +418,11 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
       }
     }
     setLayerIds(liveLayerIds);
-    trackHistory();
+    // trackHistory();
     setLayers(liveLayers);
     updateLiveBoardData({ layerIds: liveLayerIds, layers: liveLayers });
     setMyPresence({ ...myPresence, selectedLayers: [] });
+    updateDBboardLayers(liveLayers);
   }, [myPresence.selectedLayers, layers, layerIds]);
 
   const resizeSelectedLayer = useCallback(
@@ -434,17 +507,21 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     }
     const layerId = (layerIds.length + 1).toString();
     setLayerIds((prev) => [...prev, layerId]);
-    trackHistory();
+    // trackHistory();
     setLayers((prev) => ({
       ...prev,
-      [layerId]: penPointsToPathLayer(pencilDraft, lastUsedColor),
+      [layerId]: penPointsToPathLayer(pencilDraft, lastUsedValues.fillColor),
     }));
     setPencilDraft(null);
     updateLiveBoardData({
       pencilDraft: null,
     });
     setCanvasState({ mode: CanvasMode.Pencil });
-  }, [pencilDraft, layers, layerIds, lastUsedColor]);
+    updateDBboardLayers({
+      ...layers,
+      [layerId]: penPointsToPathLayer(pencilDraft, lastUsedValues.fillColor),
+    });
+  }, [pencilDraft, layers, layerIds, lastUsedValues.fillColor]);
 
   const onWheel = useCallback(
     (e: React.WheelEvent) => {
@@ -493,7 +570,6 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
       } else if (canvasState.mode === CanvasMode.Translating) {
         translateSelectedLayer(current);
       } else if (canvasState.mode === CanvasMode.Resizing) {
-        // trackHistory();
         resizeSelectedLayer(current);
       } else if (canvasState.mode === CanvasMode.Pencil) {
         continueDrawing(current, e);
@@ -518,7 +594,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   );
 
   const onPointerUp = useCallback(
-    (e: React.PointerEvent) => {
+    async (e: React.PointerEvent) => {
       const point = pointerEventToCanvasPoint(e, camera);
       if (
         canvasState.mode === CanvasMode.None ||
@@ -531,11 +607,17 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         return;
       } else if (canvasState.mode === CanvasMode.Inserting) {
         insertLayer(canvasState.layerType, point);
+      } else if (canvasState.mode === CanvasMode.Translating) {
+        updateDBboardLayers(layers);
+        setCanvasState({ mode: CanvasMode.None });
+      } else if (canvasState.mode === CanvasMode.Resizing) {
+        updateDBboardLayers(layers);
+        setCanvasState({ mode: CanvasMode.None });
       } else {
         setCanvasState({ mode: CanvasMode.None });
       }
     },
-    [camera, canvasState, setCanvasState, pencilDraft]
+    [camera, canvasState, setCanvasState, pencilDraft, layers]
   );
 
   const onPointerLeave = useCallback(
@@ -551,7 +633,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
 
   return (
     <main className="h-full w-full relative touch-none">
-      <Info boardId={boardId} />
+      <Info boardId={boardId} userId={user.id} />
       <Participants connectedUsers={connectedUsers} currentUser={user} />
       <Toolbar
         canvasState={canvasState}
@@ -568,9 +650,10 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         setLayerIds={handleUpdateLayerIds}
         myPresence={myPresence}
         setMyPresence={setMyPresence}
-        setLastUsedColor={setLastUsedColor}
+        setLastUsedValues={setLastUsedValues}
         updateLayers={updateLayers}
         deleteLayers={deleteLayer}
+        duplicateLayer={duplicateLayer}
       />
       <svg
         className="h-[100vh] w-screen"
@@ -618,7 +701,11 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
           {pencilDraft != null && pencilDraft.length > 0 && (
             <Path
               points={pencilDraft}
-              fill={colorToCss(lastUsedColor)}
+              fill={
+                typeof lastUsedValues.fillColor === "string"
+                  ? lastUsedValues.fillColor
+                  : colorToCss(lastUsedValues.fillColor)
+              }
               x={0}
               y={0}
             />

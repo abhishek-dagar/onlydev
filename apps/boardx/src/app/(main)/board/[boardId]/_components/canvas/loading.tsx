@@ -1,3 +1,4 @@
+"use client";
 import { LoaderIcon } from "lucide-react";
 import { InfoSkeleton } from "../info";
 import { ParticipantsSkeleton } from "../participants";

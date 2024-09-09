@@ -21,13 +21,19 @@ export const Ellipse = ({
       onPointerDown={(e) => onPointerDown(e, id)}
       style={{
         transform: `translate(${x}px, ${y}px)`,
+        stroke:
+          typeof layer.stroke === "string"
+            ? layer.stroke
+            : colorToCss(layer.stroke),
       }}
       cx={width / 2}
       cy={height / 2}
       rx={width / 2}
       ry={height / 2}
-      fill={fill ? colorToCss(fill) : "#000"}
-      strokeWidth={1}
+      strokeWidth={layer.strokeWidth || 1}
+      fill={
+        fill ? (typeof fill === "string" ? fill : colorToCss(fill)) : "#000"
+      }
       stroke={selectionColor || "transparent"}
     />
   );

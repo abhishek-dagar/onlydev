@@ -250,6 +250,7 @@ model BoardWorkSpaceInvitation {
   id               String   @id @default(uuid())
   createdAt        DateTime @default(now())
   updatedAt        DateTime @default(now()) @updatedAt
+  isPublic         Boolean  @default(false)
   fromUser         User?    @relation("fromInvitation", fields: [fromUserId], references: [id])
   fromUserId       String?
   toUser           User?    @relation("toInvitation", fields: [toUserId], references: [id])

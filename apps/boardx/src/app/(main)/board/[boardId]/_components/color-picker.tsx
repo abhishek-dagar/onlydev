@@ -4,12 +4,13 @@ import { colorToCss } from "@/lib/utils";
 import { Color } from "@repo/ui/lib/types/canvas.type";
 
 interface ColorPickerProps {
-  onChange: (color: Color) => void;
+  onChange: (color: Color | string) => void;
 }
 
 export const ColorPicker = ({ onChange }: ColorPickerProps) => {
   return (
     <div className="flex flex-wrap gap-2 items-center max-w-[164px] pr-2 mr-2 border-2">
+      <ColorButton color={"transparent"} onClick={onChange} />
       <ColorButton color={{ r: 243, g: 82, b: 35 }} onClick={onChange} />
       <ColorButton color={{ r: 255, g: 249, b: 177 }} onClick={onChange} />
       <ColorButton color={{ r: 68, g: 202, b: 99 }} onClick={onChange} />
@@ -23,19 +24,32 @@ export const ColorPicker = ({ onChange }: ColorPickerProps) => {
 };
 
 interface ColorButtonProps {
-  color: Color;
-  onClick: (color: Color) => void;
+  color: Color | string;
+  onClick: (color: Color | string) => void;
 }
 
 export const ColorButton = ({ color, onClick }: ColorButtonProps) => {
   return (
     <button
-      className="w-8 h-8 flex justify-center hover:opacity-75 transition"
+      className="w-5 h-5 flex justify-center hover:opacity-75 transition"
       onClick={() => onClick(color)}
     >
       <div
-        className="h-8 w-8 rounded-md border border-neutral-300"
-        style={{ backgroundColor: colorToCss(color) }}
+        className="h-5 w-5 rounded-md border bg-white"
+        style={{
+          backgroundColor:
+            typeof color === "string"
+              ? color === "transparent"
+                ? "#fff"
+                : color
+              : colorToCss(color),
+
+          backgroundImage:
+            color === "transparent"
+              ? "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==)"
+              : "",
+            backgroundSize: "10px 10px",
+        }}
         aria-hidden="true"
       />
     </button>

@@ -17,56 +17,38 @@ export enum LayerType {
   Note,
 }
 
-export type RectangleLayer = {
+export type BasicLayer = {
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  fill: Color | string;
+  rx?: number;
+  value?: string;
+  stroke: Color | string;
+  strokeWidth?: number;
+};
+
+export interface RectangleLayer extends BasicLayer {
   type: LayerType.Rectangle;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
-};
+}
 
-export type EllipseLayer = {
+export interface EllipseLayer extends BasicLayer {
   type: LayerType.Ellipse;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
-};
+}
 
-export type PathLayer = {
+export interface PathLayer extends BasicLayer {
   type: LayerType.Path;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
   points: number[][];
-  value?: string;
-};
+}
 
-export type TextLayer = {
+export interface TextLayer extends Omit<BasicLayer, "stroke" | "strokeWidth"> {
   type: LayerType.Text;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
-};
+}
 
-export type NoteLayer = {
+export interface NoteLayer extends Omit<BasicLayer, "stroke" | "strokeWidth"> {
   type: LayerType.Note;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  fill: Color;
-  value?: string;
-};
+}
 
 export type Point = {
   x: number;

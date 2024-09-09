@@ -7,7 +7,7 @@ import { fetchBoardById } from "@/lib/actions/board.action";
 const BoardPage = async ({ params }: { params: { boardId: string } }) => {
   const user = await currentUser();
   if (!user) redirect("/signin");
-  const {board} = await fetchBoardById(params.boardId);
+  const { board } = await fetchBoardById(params.boardId, user.id);
   if (!board) redirect("/app/dashboard");
   return (
     <div className="h-screen w-screen">

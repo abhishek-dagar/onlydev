@@ -34,8 +34,8 @@ export const Toolbar = ({
   canRedo,
 }: ToolbarProps) => {
   return (
-    <div className="absolute top-[50%] -translate-y-[50%] left-2 flex flex-col gap-y-4">
-      <div className="bg-muted rounded-md p-1.5 flex gap-y-1 flex-col items-center shadow-md">
+    <div className="absolute left-[50%] -translate-x-[50%] bottom-2 flex gap-x-4">
+      <div className="bg-muted rounded-md p-1.5 flex gap-x-1 items-center shadow-md">
         <ToolButton
           label="select"
           icon={MousePointer2Icon}
@@ -115,7 +115,7 @@ export const Toolbar = ({
           isActive={canvasState.mode === CanvasMode.Pencil}
         />
       </div>
-      <div className="bg-muted rounded-md p-1.5 flex flex-col items-center shadow-md">
+      <div className="bg-muted rounded-md p-1.5 flex items-center shadow-md">
         <ToolButton
           label="Undo"
           icon={Undo2Icon}
@@ -135,6 +135,6 @@ export const Toolbar = ({
 
 export const ToolbarSkeleton = () => {
   return (
-    <div className="absolute top-[50%] -translate-y-[50%] left-2 flex flex-col gap-y-4 bg-white rounded-md shadow-md h-[360px] w-[52px]" />
+    <div className="absolute left-[50%] -translate-x-[50%] bottom-2 flex flex-col gap-y-4 bg-white rounded-md shadow-md h-[360px] w-[52px]" />
   );
 };

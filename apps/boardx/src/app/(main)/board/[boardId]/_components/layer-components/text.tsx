@@ -79,9 +79,7 @@ export const Text = ({
         )}
         style={{
           fontSize: fontSize,
-          color: layer.fill
-            ? colorToCss(layer.fill)
-            : "var(--muted-foreground)",
+          color: layer.fill ? (typeof layer.fill === "string" ? layer.fill : colorToCss(layer.fill)) : "var(--muted-foreground)",
         }}
       />
     </foreignObject>

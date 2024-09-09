@@ -15,12 +15,13 @@ import { useEffect, useState } from "react";
 
 interface InfoProps {
   boardId: string;
+  userId: string;
 }
 const TabSeparator = () => {
   return <div className="text-neutral-300 px-1.5">|</div>;
 };
 
-export const Info = ({ boardId }: InfoProps) => {
+export const Info = ({ boardId, userId }: InfoProps) => {
   const [data, setData] = useState<BoardType>();
   const router = useRouter();
   //   const data = useQuery(api.board.get, { id: boardId as Id<"boards"> });
@@ -41,7 +42,7 @@ export const Info = ({ boardId }: InfoProps) => {
   };
 
   const getBoard = async () => {
-    const { board } = await fetchBoardById(boardId);
+    const { board } = await fetchBoardById(boardId, userId);
     if (board) setData(board);
   };
 
@@ -63,7 +64,6 @@ export const Info = ({ boardId }: InfoProps) => {
           <Button
             variant={"board"}
             className="text-base font-normal px-2"
-            // onClick={() => onOpen(data._id, data.title)}
           >
             {data.name}
           </Button>

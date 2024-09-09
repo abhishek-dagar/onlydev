@@ -61,7 +61,7 @@ export const fetchBoards = async (workspaceId: string) => {
   }
 };
 
-export const fetchBoardById = async (boardId: string) => {
+export const fetchBoardById = async (boardId: string, userId: String) => {
   "use server";
   try {
     const board = await db.board.findUnique({
@@ -69,6 +69,26 @@ export const fetchBoardById = async (boardId: string) => {
         id: boardId,
       },
     });
+
+    if (!board) {
+      return { err: "Board not found", board: undefined };
+    }
+
+    const boardWorkspace = await db.boardWorkspaces.findUnique({
+      where: {
+        id: board.boardWorkspaceId,
+      },
+      include: {
+        members: true,
+      },
+    });
+
+    const isMember = boardWorkspace?.members.some(
+      (member) => member.id === userId
+    );
+    if (!isMember && boardWorkspace?.userId !== userId)
+      return { err: "Board not found", board: undefined };
+
     return { err: undefined, board };
   } catch (error: any) {
     return { err: error.message, board: undefined };
@@ -92,14 +112,19 @@ export const deleteBoard = async (boardId: string) => {
 export const updateBoard = async (board: any) => {
   "use server";
   try {
+    const previousBoard = await db.board.findUnique({
+      where: {
+        id: board.id,
+      },
+    });
     const updatedBoard = await db.board.update({
       where: {
         id: board.id,
       },
       data: board,
     });
-    return { err: undefined, board: updatedBoard };
+    return { err: undefined, board: updatedBoard, previousBoard };
   } catch (error: any) {
-    return { err: error.message, board: undefined };
+    return { err: error.message, board: undefined, previousBoard: undefined };
   }
 };
