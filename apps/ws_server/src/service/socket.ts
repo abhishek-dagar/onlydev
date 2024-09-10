@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 class SocketService {
   private _io: Server;
   private static onlineUsers: { [key: string]: string } = {};
-  private static connectedUsers: String[] = [];
+  private static connectedUsers: { [key: string]: String[] } = {};
   constructor() {
     this._io = new Server({
       cors: {
@@ -32,9 +32,16 @@ class SocketService {
       });
 
       socket.on("connect-to-board-room", ({ roomId, userId }) => {
-        SocketService.connectedUsers.push(userId);
+        if (SocketService.connectedUsers[roomId]) {
+          SocketService.connectedUsers[roomId].push(userId);
+        } else {
+          SocketService.connectedUsers[roomId] = [userId];
+        }
         socket.join(roomId);
-        io.to(roomId).emit("new-user-connected", SocketService.connectedUsers);
+        io.to(roomId).emit(
+          "new-user-connected",
+          SocketService.connectedUsers[roomId]
+        );
       });
 
       socket.on("update-board", (data) => {
@@ -45,13 +52,13 @@ class SocketService {
         io.to(data.roomId).emit("update-board", {
           ...data,
           cursors,
-          connectedUsers: SocketService.connectedUsers,
+          connectedUsers: SocketService.connectedUsers[data.roomId],
         });
       });
 
       socket.on("leave-board-room", ({ roomId, userId }) => {
-        SocketService.connectedUsers.splice(
-          SocketService.connectedUsers.indexOf(userId),
+        SocketService.connectedUsers[roomId].splice(
+          SocketService.connectedUsers[roomId].indexOf(userId),
           1
         );
         io.to(roomId).emit("new-user-connected", SocketService.connectedUsers);
