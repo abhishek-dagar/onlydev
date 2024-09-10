@@ -31,6 +31,7 @@ import { Participants } from "../participants";
 import { updateBoard } from "@/lib/actions/board.action";
 import { BoardType } from "@repo/ui/lib/types/bards.type";
 import { Path } from "../layer-components/path";
+import { useTheme } from "next-themes";
 
 const MAX_LAYERS = 100;
 
@@ -43,7 +44,8 @@ interface CanvasProps {
 const Canvas = ({ boardId, board, user }: CanvasProps) => {
   const [canvasState, setCanvasState] = useState<CanvasState>({
     mode: CanvasMode.None,
-  });  
+  });
+  const { theme } = useTheme();
 
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
   const [myPresence, setMyPresence] = useState<MyPresenceType>({
@@ -55,12 +57,14 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     fillColor: Color | string;
     strokeColor: Color | string;
     strokeWidth: number;
+    textColor: Color | string;
     rx: number;
   }>({
-    fillColor: "#fff",
-    strokeColor: "#fff",
+    fillColor: "#ffffff",
+    strokeColor: "#ffffff",
     strokeWidth: 1,
     rx: 5,
+    textColor: theme?.includes("dark") ? "#ffffff" : "#000",
   });
   const [cursors, setCursors] = useState<Record<string, Point>>({});
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
@@ -271,6 +275,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         layers: { ...layers, [key]: layer },
       });
       setLayers((prev) => ({ ...prev, [key]: layer }));
+      updateDBboardLayers({ ...layers, [key]: layer });
     },
     [layers]
   );
@@ -386,7 +391,15 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         height: 100,
         width: 100,
         fill: lastUsedValues.fillColor,
+        textColor:
+          layerType === LayerType.Note
+            ? lastUsedValues.fillColor === "#ffffff"
+              ? "#000000"
+              : "#ffffff"
+            : lastUsedValues.textColor,
       };
+      console.log("layer", lastUsedValues.strokeColor);
+      
 
       setLayerIds((prev) => [...prev, layerId]);
       // trackHistory();
@@ -404,7 +417,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
       setCanvasState({ mode: CanvasMode.None });
       updateDBboardLayers({ ...layers, [layerId]: layer });
     },
-    [layerIds, lastUsedValues.fillColor, layers, myPresence]
+    [layerIds, lastUsedValues, layers, myPresence]
   );
 
   const deleteLayer = useCallback(() => {
@@ -673,7 +686,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
               key={index}
               id={layerId}
               onLayerPointerDown={onLayerPointerDown}
-              selectionColor={"#fff"}
+              selectionColor={"#ffffff"}
               layers={layers}
               updateLayers={updateLayers}
             />

@@ -138,6 +138,18 @@ export const SelectionTools = memo(
       },
       [selection, layers, setLastUsedValues]
     );
+
+    const updateLastUsedValues = useCallback(
+      (key: string, fill: Color | string) => {
+        const liveLayers = layers;
+        setLastUsedValues((prev: any) => ({ ...prev, [key]: fill }) as any);
+        selection.forEach((layerId) => {
+          updateLayers(layerId, { ...liveLayers[layerId], fill });
+        });
+      },
+      [selection, layers, setLastUsedValues]
+    );
+
     const setEdgeRadius = useCallback(
       (isRound: boolean) => {
         setIsRound(isRound);
@@ -172,17 +184,38 @@ export const SelectionTools = memo(
     // const y = selectionBounds.y + camera.y;
     return (
       <div
-        className="absolute p-3 rounded-xl bg-muted h-[75%] shadow-sm border flex flex-col gap-4 select-none top-[50%] -translate-y-[50%] left-2"
+        className="absolute p-3 rounded-xl bg-muted h-[75%] overflow-auto shadow-sm border flex flex-col gap-4 select-none top-[50%] -translate-y-[50%] left-2"
         // style={{
         //   transform: `translate(calc(${x}px - 50%), calc(${y - 16}px - 100%))`,
         // }}
       >
-        <Wrapper title="Background">
-          <ColorPicker onChange={setFill} />
-        </Wrapper>
-        <Wrapper title="stroke">
-          <ColorPicker onChange={setStokeColor} />
-        </Wrapper>
+        {myPresence.selectedLayers.filter(
+          (layerId) =>
+            layers[layerId].type !== LayerType.Text &&
+            layers[layerId].type !== LayerType.Note
+        ).length === 0 && (
+          <Wrapper title="Color">
+            <ColorPicker
+              onChange={(value) => updateLastUsedValues("textColor", value)}
+            />
+          </Wrapper>
+        )}
+        {myPresence.selectedLayers.filter(
+          (layerId) => layers[layerId].type === LayerType.Text
+        ).length === 0 && (
+          <Wrapper title="Background">
+            <ColorPicker onChange={setFill} />
+          </Wrapper>
+        )}
+        {myPresence.selectedLayers.filter(
+          (layerId) =>
+            layers[layerId].type !== LayerType.Ellipse &&
+            layers[layerId].type !== LayerType.Rectangle
+        ).length === 0 && (
+          <Wrapper title="stroke">
+            <ColorPicker onChange={setStokeColor} />
+          </Wrapper>
+        )}
         {myPresence.selectedLayers.filter(
           (layerId) =>
             layers[layerId].type !== LayerType.Ellipse &&

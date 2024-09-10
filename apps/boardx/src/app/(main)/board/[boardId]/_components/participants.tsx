@@ -20,7 +20,9 @@ export const Participants = ({
   const [users, setUsers] = useState<UserType[]>([]);
   useEffect(() => {
     fetchUserProfiles(
-      connectedUsers?.filter((id) => id !== currentUser?.id)
+      Array.isArray(connectedUsers)
+        ? connectedUsers?.filter((id) => id !== currentUser?.id)
+        : []
     ).then(({ users }) => {
       if (users) setUsers(users);
     });

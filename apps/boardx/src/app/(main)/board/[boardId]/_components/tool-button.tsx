@@ -20,7 +20,7 @@ export const ToolButton = ({
   isDisabled,
 }: ToolButtonProps) => {
   return (
-    <Hint label={label} side="left" sideOffset={10}>
+    <Hint label={label} side="top" sideOffset={10}>
       <Button
         disabled={isDisabled}
         onClick={onClick}

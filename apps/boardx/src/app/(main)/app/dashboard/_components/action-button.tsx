@@ -6,8 +6,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { Switch } from "@repo/ui/components/ui/switch";
 import DeleteConfirmModal from "@repo/ui/components/common/delete-confirm-modal";
-import { Link2Icon, Trash2Icon } from "lucide-react";
+import {
+  Link2Icon,
+  LockKeyholeIcon,
+  LockKeyholeOpenIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { BoardType } from "@repo/ui/lib/types/bards.type";
 import RenameModal from "@/components/models/rename-modal";
@@ -39,6 +45,10 @@ const ActionButton = ({
       .catch(() => toast.error("Failed to copy link"));
   };
 
+  const handleIsPublic = async (checked: boolean) => {
+    updateBoardData({ ...board, isPublic: checked });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
@@ -48,6 +58,17 @@ const ActionButton = ({
         sideOffset={sideOffset}
         className="w-60"
       >
+        <div className="flex items-center justify-between px-3 pt-3">
+          <p className="flex items-center">
+            {board.isPublic ? (
+              <LockKeyholeOpenIcon className="h-4 w-4 mr-2" />
+            ) : (
+              <LockKeyholeIcon className="h-4 w-4 mr-2" />
+            )}
+            Public
+          </p>
+          <Switch checked={board.isPublic} onCheckedChange={handleIsPublic} />
+        </div>
         <DropdownMenuItem onClick={onCopyLink} className="p-3 cursor-pointer">
           <Link2Icon className="h-4 w-4 mr-2" />
           Copy board link

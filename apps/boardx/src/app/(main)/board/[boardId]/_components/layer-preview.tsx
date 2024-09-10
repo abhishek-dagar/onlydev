@@ -84,7 +84,13 @@ export const LayerPreview = ({
           onPointerDown={(e) => onLayerPointerDown(e, id)}
           x={layer.x}
           y={layer.y}
-          fill={layer.fill ? colorToCss(layer.fill) : "#fff"}
+          fill={
+            layer.fill
+              ? typeof layer.fill === "string"
+                ? layer.fill
+                : colorToCss(layer.fill)
+              : "#fff"
+          }
           stroke={selectionColor}
         />
       );

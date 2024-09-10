@@ -86,7 +86,7 @@ export const fetchBoardById = async (boardId: string, userId: string) => {
     const isMember = boardWorkspace?.members.some(
       (member) => member.id === userId
     );
-    if (!isMember && boardWorkspace?.userId !== userId)
+    if (!board.isPublic && !isMember && boardWorkspace?.userId !== userId)
       return { err: "Board not found", board: undefined };
 
     return { err: undefined, board };

@@ -139,6 +139,7 @@ export function penPointsToPathLayer(
     type: LayerType.Path,
     x: left,
     y: top,
+    stroke: color,
     width: right - left,
     height: bottom - top,
     fill: color,

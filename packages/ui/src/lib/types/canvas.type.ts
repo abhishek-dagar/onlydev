@@ -44,10 +44,12 @@ export interface PathLayer extends BasicLayer {
 
 export interface TextLayer extends Omit<BasicLayer, "stroke" | "strokeWidth"> {
   type: LayerType.Text;
+  textColor?: Color | string;
 }
 
 export interface NoteLayer extends Omit<BasicLayer, "stroke" | "strokeWidth"> {
   type: LayerType.Note;
+  textColor?: Color | string;
 }
 
 export type Point = {
