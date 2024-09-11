@@ -1,6 +1,7 @@
 import React from "react";
 import {
   CircleIcon,
+  HandIcon,
   MousePointer2Icon,
   PencilIcon,
   Redo2Icon,
@@ -35,7 +36,15 @@ export const Toolbar = ({
 }: ToolbarProps) => {
   return (
     <div className="absolute left-[50%] -translate-x-[50%] bottom-2 flex gap-x-4">
-      <div className="bg-muted rounded-md p-1.5 flex gap-x-1 items-center shadow-md">
+      <div className="bg-muted rounded-md p-1.5 flex gap-x-4 items-center shadow-md">
+        <ToolButton
+          label="select"
+          icon={HandIcon}
+          onClick={() => setCanvasState({ mode: CanvasMode.Grabbing })}
+          isActive={
+            canvasState.mode === CanvasMode.Grabbing
+          }
+        />
         <ToolButton
           label="select"
           icon={MousePointer2Icon}
@@ -135,6 +144,6 @@ export const Toolbar = ({
 
 export const ToolbarSkeleton = () => {
   return (
-    <div className="absolute left-[50%] -translate-x-[50%] bottom-2 flex flex-col gap-y-4 bg-white rounded-md shadow-md h-[360px] w-[52px]" />
+    <div className="absolute left-[50%] -translate-x-[50%] bottom-2 flex flex-col gap-y-4 bg-muted rounded-md shadow-md h-[52px] w-[360px]" />
   );
 };

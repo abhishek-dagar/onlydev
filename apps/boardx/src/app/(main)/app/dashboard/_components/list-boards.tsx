@@ -1,6 +1,6 @@
 "use client";
 import { UserType } from "@repo/ui/lib/types/user.types";
-import { PlusIcon } from "lucide-react";
+import { PlusCircleIcon, PlusIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -94,8 +94,8 @@ const ListBoards = ({ user }: { user: UserType }) => {
               className="col-span-1 aspect-[100/127] bg-primary rounded-lg hover:bg-primary/60 flex flex-col items-center justify-center py-6 text-white"
               onClick={createNewBoard}
             >
-              <PlusIcon />
-              <p className="text-xs font-light">New board</p>
+              <PlusCircleIcon size={32} />
+              <p className="text-xs md:text-lg font-light">New board</p>
             </button>
             {boards
               ?.filter((board) =>

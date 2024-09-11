@@ -26,8 +26,9 @@ export const ToolButton = ({
         onClick={onClick}
         size={"icon"}
         variant={isActive ? "boardActive" : "board"}
+        className="h-7 w-7"
       >
-        <Icon/>
+        <Icon size={16} />
       </Button>
     </Hint>
   );

@@ -32,6 +32,8 @@ import { updateBoard } from "@/lib/actions/board.action";
 import { BoardType } from "@repo/ui/lib/types/bards.type";
 import { Path } from "../layer-components/path";
 import { useTheme } from "next-themes";
+import { boundingBox } from "@/components/custom-hooks/use-selection-bounds";
+import { cn } from "@repo/ui/lib/utils";
 
 const MAX_LAYERS = 100;
 
@@ -66,6 +68,9 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     rx: 5,
     textColor: theme?.includes("dark") ? "#ffffff" : "#000",
   });
+
+  const [tempLayer, setTempLayer] = useState<Layer | null>(null);
+
   const [cursors, setCursors] = useState<Record<string, Point>>({});
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
   const [pencilDraft, setPencilDraft] = useState<number[][] | null>(null);
@@ -154,6 +159,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     setCursors(data.cursors);
     setConnectedUsers(data.connectedUsers);
     setPencilDraft(data.pencilDraft);
+    setTempLayer(data.tempLayer);
   };
 
   const updateLiveBoardData = useCallback(
@@ -165,6 +171,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         camera,
         cursors,
         pencilDraft,
+        tempLayer,
         roomId: boardId,
         userId: user.id,
         ...data,
@@ -381,7 +388,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         return;
       }
       const layerId = (layerIds.length + 1).toString();
-      const layer = {
+      let layer = {
         type: layerType,
         x: position.x,
         y: position.y,
@@ -398,8 +405,10 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
               : "#ffffff"
             : lastUsedValues.textColor,
       };
-      console.log("layer", lastUsedValues.strokeColor);
-      
+
+      if (tempLayer) {
+        layer = tempLayer as any;
+      }
 
       setLayerIds((prev) => [...prev, layerId]);
       // trackHistory();
@@ -415,9 +424,10 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
 
       setMyPresence({ ...myPresence, selectedLayers: [layerId] });
       setCanvasState({ mode: CanvasMode.None });
+      setTempLayer(null);
       updateDBboardLayers({ ...layers, [layerId]: layer });
     },
-    [layerIds, lastUsedValues, layers, myPresence]
+    [layerIds, lastUsedValues, layers, myPresence, tempLayer]
   );
 
   const deleteLayer = useCallback(() => {
@@ -508,6 +518,65 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     [canvasState, pencilDraft]
   );
 
+  const startDrawingShape = useCallback(
+    (point: Point) => {
+      if (canvasState.mode !== CanvasMode.Inserting) {
+        return;
+      }
+      const layer = {
+        type: canvasState.layerType,
+        x: point.x,
+        y: point.y,
+        rx: lastUsedValues.rx,
+        stroke: lastUsedValues.strokeColor,
+        strokeWidth: lastUsedValues.strokeWidth,
+        height: 0,
+        width: 0,
+        fill: lastUsedValues.fillColor,
+      };
+
+      setTempLayer(layer);
+    },
+    [canvasState, tempLayer]
+  );
+
+  const continueDrawingShape = useCallback(
+    (point: Point, e: React.PointerEvent) => {
+      if (
+        canvasState.mode !== CanvasMode.Inserting ||
+        e.buttons !== 1 ||
+        tempLayer == null
+      ) {
+        return;
+      }
+      const XYWH = boundingBox([tempLayer]);
+      if (!XYWH) return;
+
+      if (!XYWH) return;
+
+      let corner = Side.Bottom + Side.Right; // Default to bottom-right corner
+
+      // Determine the corner based on the direction of movement
+      if (point.x < XYWH.x && point.y < XYWH.y) {
+        corner = Side.Top + Side.Left; // Top-left corner
+      } else if (point.x < XYWH.x && point.y > XYWH.y + XYWH.height) {
+        corner = Side.Bottom + Side.Left; // Bottom-left corner
+      } else if (point.x > XYWH.x + XYWH.width && point.y < XYWH.y) {
+        corner = Side.Top + Side.Right; // Top-right corner
+      } else if (
+        point.x > XYWH.x + XYWH.width &&
+        point.y > XYWH.y + XYWH.height
+      ) {
+        corner = Side.Bottom + Side.Right; // Bottom-right corner
+      }
+
+      const bounds = resizeBounds(XYWH, corner, point);
+
+      setTempLayer((prev) => ({ ...prev, ...bounds }) as any);
+    },
+    [canvasState, tempLayer]
+  );
+
   const insertPath = useCallback(() => {
     // const liveLayers = layers;
     if (
@@ -555,7 +624,16 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
       const point = pointerEventToCanvasPoint(e, camera);
+      if (canvasState.mode === CanvasMode.Grabbing) {
+        return;
+      }
       if (canvasState.mode === CanvasMode.Inserting) {
+        if (
+          canvasState.layerType === LayerType.Rectangle ||
+          canvasState.layerType === LayerType.Ellipse
+        ) {
+          startDrawingShape(point);
+        }
         return;
       }
 
@@ -586,6 +664,8 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         resizeSelectedLayer(current);
       } else if (canvasState.mode === CanvasMode.Pencil) {
         continueDrawing(current, e);
+      } else if (canvasState.mode === CanvasMode.Inserting) {
+        continueDrawingShape(current, e);
       }
 
       setCursors((prev) => {
@@ -609,7 +689,9 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   const onPointerUp = useCallback(
     async (e: React.PointerEvent) => {
       const point = pointerEventToCanvasPoint(e, camera);
-      if (
+      if (canvasState.mode === CanvasMode.Grabbing) {
+        return;
+      } else if (
         canvasState.mode === CanvasMode.None ||
         canvasState.mode === CanvasMode.Pressing
       ) {
@@ -630,7 +712,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         setCanvasState({ mode: CanvasMode.None });
       }
     },
-    [camera, canvasState, setCanvasState, pencilDraft, layers]
+    [camera, canvasState, setCanvasState, pencilDraft, layers, tempLayer]
   );
 
   const onPointerLeave = useCallback(
@@ -645,8 +727,25 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   );
 
   return (
-    <main className="h-full w-full relative touch-none">
-      <Info boardId={boardId} userId={user.id} />
+    <main
+      className={cn(
+        "h-full w-full relative touch-none",
+        {
+          "cursor-crosshair":
+            canvasState.mode === CanvasMode.Inserting &&
+            (canvasState.layerType === LayerType.Rectangle ||
+              canvasState.layerType === LayerType.Ellipse),
+        },
+        {
+          "cursor-grab": canvasState.mode === CanvasMode.Grabbing,
+        }
+      )}
+    >
+      <Info
+        boardId={boardId}
+        userId={user.id}
+        workspaceId={board.boardWorkspaceId}
+      />
       <Participants connectedUsers={connectedUsers} currentUser={user} />
       <Toolbar
         canvasState={canvasState}
@@ -711,6 +810,15 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
               .filter((id) => id !== user.id)
               .reduce((acc, id) => ({ ...acc, [id]: cursors[id] }), {})}
           />
+          {tempLayer !== null && (
+            <LayerPreview
+              id={"0"}
+              onLayerPointerDown={() => {}}
+              selectionColor={"#ffffff"}
+              layers={{ "0": tempLayer }}
+              updateLayers={() => {}}
+            />
+          )}
           {pencilDraft != null && pencilDraft.length > 0 && (
             <Path
               points={pencilDraft}

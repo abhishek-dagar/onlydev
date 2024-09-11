@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@repo/ui/components/ui/dialog";
 import { UserType } from "@repo/ui/lib/types/user.types";
-import { CheckIcon, XIcon } from "lucide-react";
+import { BellIcon, CheckIcon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -84,7 +84,8 @@ const InvitationModel = ({ user }: { user: UserType }) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant={"outline"} className="relative">
-          <span>Invitations</span>
+          <span className="hidden sm:inline">Invitations</span>
+          <BellIcon className="inline sm:hidden" size={18} />
           {invitations.length > 0 && (
             <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />

@@ -23,7 +23,7 @@ const BoardCard = ({
   };
   return (
     <Link href={`/board/${board.id}`}>
-      <div className="group aspect-[100/127] border rounded-lg flex flex-col justify-between overflow-hidden">
+      <div className="group aspect-[100/127] border rounded-lg flex flex-col justify-between overflow-hidden hover:shadow-md">
         <div className="relative flex-1 bg-amber-50">
           <Image
             src={board.imageUrl}
@@ -67,7 +67,7 @@ const Footer = ({
   };
 
   return (
-    <div className="relative bg-white p-3">
+    <div className="relative bg-muted p-3">
       <p className="text-[13px] text-muted-foreground truncate max-w-[(calc(100%-20px)]">
         {board.name}
       </p>

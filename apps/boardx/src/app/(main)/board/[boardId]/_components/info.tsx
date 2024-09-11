@@ -16,12 +16,13 @@ import { useEffect, useState } from "react";
 interface InfoProps {
   boardId: string;
   userId: string;
+  workspaceId: string;
 }
 const TabSeparator = () => {
   return <div className="text-neutral-300 px-1.5">|</div>;
 };
 
-export const Info = ({ boardId, userId }: InfoProps) => {
+export const Info = ({ boardId, userId, workspaceId }: InfoProps) => {
   const [data, setData] = useState<BoardType>();
   const router = useRouter();
   //   const data = useQuery(api.board.get, { id: boardId as Id<"boards"> });
@@ -55,7 +56,7 @@ export const Info = ({ boardId, userId }: InfoProps) => {
     <div className="absolute top-2 left-2 bg-muted rounded-md px-1.5 h-12 flex items-center shadow-md">
       <Hint label="Go to boards" side="bottom" sideOffset={10}>
         <Button variant={"board"} className="px-2">
-          <Logo to="/app/dashboard" />
+          <Logo to={`/app/dashboard?workspaceId=${workspaceId}`} />
         </Button>
       </Hint>
       <TabSeparator />
