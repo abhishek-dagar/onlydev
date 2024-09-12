@@ -30,7 +30,7 @@ export const Path = (props: PathProps) => {
       )}
       fill={fill}
       strokeWidth={1}
-      stroke={stroke}
+      // stroke={stroke}
     />
   );
 };

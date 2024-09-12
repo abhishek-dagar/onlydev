@@ -1,10 +1,10 @@
 import { Kalam } from "next/font/google";
-import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
+import { ContentEditableEvent } from "react-contenteditable";
 
 import { colorToCss, getContrastingTextColor } from "@/lib/utils";
 import { Layer, NoteLayer } from "@repo/ui/lib/types/canvas.type";
 import { cn } from "@repo/ui/lib/utils";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
 const font = Kalam({
   subsets: ["latin"],
@@ -37,18 +37,12 @@ export const Note = ({
 }: NoteProps) => {
   // const { x, y, width, height, fill, value } = layer.;
 
-  const [fontSize, setFontSize] = useState<number>();
-
   const updateValue = useCallback(
     (newValue: string) => {
       updateLayer(id, { ...layer, value: newValue });
     },
     [layer]
   );
-
-  useEffect(() => {
-    setFontSize(calculateFontSize(layer.width, layer.height));
-  }, [layer.width, layer.height, layer.value]);
 
   const handleContentChange = (e: ContentEditableEvent) => {
     updateValue(e.target.value);
@@ -71,20 +65,23 @@ export const Note = ({
       }}
       className="shadow-md drop-shadow-xl"
     >
-      <ContentEditable
-        html={layer.value || ""}
+      <textarea
+        value={layer.value || ""}
         onChange={handleContentChange}
         className={cn(
-          "h-full w-full flex items-center justify-center text-center outline-none",
+          "resize-none h-full w-full flex items-center justify-center text-center drop-shadow-md outline-none whitespace-pre-wrap",
           font.className
         )}
         style={{
-          fontSize: fontSize,
+          fontSize: calculateFontSize(layer.width, layer.height),
           color: layer.textColor
             ? typeof layer.textColor === "string"
               ? layer.textColor
               : getContrastingTextColor(layer.textColor)
             : "#000",
+          overflow: "hidden",
+          border: "none",
+          background: "transparent",
         }}
       />
     </foreignObject>

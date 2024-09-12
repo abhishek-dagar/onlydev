@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
 import { Switch } from "@repo/ui/components/ui/switch";
@@ -22,6 +23,7 @@ interface ActionsProps {
   board: BoardType;
   children: React.ReactNode;
   side?: "top" | "right" | "bottom" | "left" | undefined;
+  align?: "start" | "center" | "end" | undefined;
   sideOffset?: number | undefined;
   id: string;
   title: string;
@@ -33,6 +35,7 @@ const ActionButton = ({
   board,
   children,
   side,
+  align,
   sideOffset,
   id,
   handleDelete,
@@ -55,10 +58,11 @@ const ActionButton = ({
       <DropdownMenuContent
         onClick={(e) => e.stopPropagation()}
         side={side}
+        align={align}
         sideOffset={sideOffset}
-        className="w-60"
+        className="w-60 text-sm"
       >
-        <div className="flex items-center justify-between px-3 pt-3">
+        <div className="flex items-center justify-between p-3">
           <p className="flex items-center">
             {board.isPublic ? (
               <LockKeyholeOpenIcon className="h-4 w-4 mr-2" />
@@ -67,17 +71,20 @@ const ActionButton = ({
             )}
             Public
           </p>
-          <Switch checked={board.isPublic} onCheckedChange={handleIsPublic} />
+          <DropdownMenuShortcut>
+            <Switch
+              checked={board.isPublic}
+              onCheckedChange={handleIsPublic}
+              className="h-4 w-9"
+              thumbClassName="h-3 w-3"
+            />
+          </DropdownMenuShortcut>
         </div>
         <DropdownMenuItem onClick={onCopyLink} className="p-3 cursor-pointer">
           <Link2Icon className="h-4 w-4 mr-2" />
           Copy board link
         </DropdownMenuItem>
-        <DropdownMenuItem
-          //   onClick={() => onOpen(id, title)}
-          className="p-3 cursor-pointer"
-          asChild
-        >
+        <DropdownMenuItem className="p-3 cursor-pointer" asChild>
           <RenameModal board={board} updateBoardData={updateBoardData} />
         </DropdownMenuItem>
         <DeleteConfirmModal onConfirm={handleDelete}>

@@ -34,6 +34,12 @@ export const Rectangle = ({
       width={width}
       height={height}
       strokeWidth={layer.strokeWidth || 1}
+      strokeDasharray={
+        layer.strokeStyle === "solid"
+          ? undefined
+          : `${layer.strokeStyle === "dashed" ? "7" : "2"} ${layer.strokeWidth === 3 ? "10" : layer.strokeWidth === 5 ? "15" : "20"}`
+      }
+      strokeLinecap="round"
       fill={
         fill ? (typeof fill === "string" ? fill : colorToCss(fill)) : "#000"
       }

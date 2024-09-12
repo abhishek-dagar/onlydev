@@ -12,7 +12,7 @@ interface LayerPreviewProps {
   id: string;
   onLayerPointerDown: (e: React.PointerEvent, layerId: string) => void;
   selectionColor?: string;
-  layers?: { [key: string]: Layer };
+  layer: Layer;
   updateLayers: (key: string, layer: Layer) => void;
 }
 
@@ -20,20 +20,20 @@ export const LayerPreview = ({
   id,
   onLayerPointerDown,
   selectionColor,
-  layers,
+  layer,
   updateLayers,
 }: LayerPreviewProps) => {
   // const layer = useStorage((root) => root.layers.get(id));
-  const [layer, setLayer] = useState<Layer>();
+  // const [layer, setLayer] = useState<Layer>();
 
-  useEffect(() => {
-    if (layers) {
-      const layer = layers[id];
-      if (layer) {
-        setLayer(layer);
-      }
-    }
-  }, [id, layers]);
+  // useEffect(() => {
+  //   if (layers) {
+  //     const layer = layers[id];
+  //     if (layer) {
+  //       setLayer(layer);
+  //     }
+  //   }
+  // }, [id, layers]);
 
   if (!layer) return null;
 

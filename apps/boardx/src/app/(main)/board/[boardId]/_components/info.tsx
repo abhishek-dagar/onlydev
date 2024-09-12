@@ -53,8 +53,8 @@ export const Info = ({ boardId, userId, workspaceId }: InfoProps) => {
 
   if (!data) return <InfoSkeleton />;
   return (
-    <div className="absolute top-2 left-2 bg-muted rounded-md px-1.5 h-12 flex items-center shadow-md">
-      <Hint label="Go to boards" side="bottom" sideOffset={10}>
+    <div className="absolute top-2 left-2 bg-muted rounded-md px-1.5 h-10 flex items-center shadow-md">
+      {/* <Hint label="Go to boards" side="bottom" sideOffset={10}>
         <Button variant={"board"} className="px-2">
           <Logo to={`/app/dashboard?workspaceId=${workspaceId}`} />
         </Button>
@@ -70,23 +70,20 @@ export const Info = ({ boardId, userId, workspaceId }: InfoProps) => {
           </Button>
         </RenameModal>
       </Hint>
-      <TabSeparator />
+      <TabSeparator /> */}
       <ActionButton
         board={data}
         id={data.id}
         title={data.name}
         side="bottom"
+        align="start"
         sideOffset={10}
         handleDelete={handleDelete}
         updateBoardData={updateBoardData}
       >
-        <div>
-          <Hint label="Main menu" side="bottom" sideOffset={10}>
-            <Button size={"icon"} variant={"board"}>
-              <MenuIcon />
-            </Button>
-          </Hint>
-        </div>
+        <Button size={"icon"} variant={"board"} className="h-7 w-7">
+          <MenuIcon size={18} />
+        </Button>
       </ActionButton>
     </div>
   );
@@ -94,6 +91,6 @@ export const Info = ({ boardId, userId, workspaceId }: InfoProps) => {
 
 export const InfoSkeleton = () => {
   return (
-    <div className="absolute top-2 left-2 bg-muted rounded-md px-1.5 h-12 flex items-center shadow-md w-[300px]" />
+    <div className="absolute top-2 left-2 bg-muted rounded-md px-1.5 h-10 flex items-center shadow-md w-10" />
   );
 };

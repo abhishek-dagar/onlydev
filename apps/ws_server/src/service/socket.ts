@@ -57,7 +57,7 @@ class SocketService {
       });
 
       socket.on("leave-board-room", ({ roomId, userId }) => {
-        SocketService.connectedUsers[roomId].splice(
+        SocketService.connectedUsers[roomId]?.splice(
           SocketService.connectedUsers[roomId].indexOf(userId),
           1
         );

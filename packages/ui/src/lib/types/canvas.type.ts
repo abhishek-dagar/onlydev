@@ -26,6 +26,7 @@ export type BasicLayer = {
   rx?: number;
   value?: string;
   stroke: Color | string;
+  strokeStyle?: "solid" | "dashed" | "dotted";
   strokeWidth?: number;
 };
 
@@ -42,12 +43,12 @@ export interface PathLayer extends BasicLayer {
   points: number[][];
 }
 
-export interface TextLayer extends Omit<BasicLayer, "stroke" | "strokeWidth"> {
+export interface TextLayer extends Omit<BasicLayer, "stroke" | "strokeWidth" | "strokeStyle"> {
   type: LayerType.Text;
   textColor?: Color | string;
 }
 
-export interface NoteLayer extends Omit<BasicLayer, "stroke" | "strokeWidth"> {
+export interface NoteLayer extends Omit<BasicLayer, "stroke" | "strokeWidth" | "strokeStyle"> {
   type: LayerType.Note;
   textColor?: Color | string;
 }

@@ -17,9 +17,9 @@ export const UserAvatar = ({
 }: UserAvatarProps) => {
   return (
     <Hint label={name || "Teammate"} side="bottom" sideOffset={10}>
-      <Avatar className="h-8 w-8 border-2" style={{ borderColor }}>
+      <Avatar className="h-8 w-8 border-2 bg-background" style={{ borderColor }}>
         <AvatarImage src={src} />
-        <AvatarFallback className="text-sm font-semibold uppercase">
+        <AvatarFallback className="text-sm font-semibold uppercase bg-background">
           {fallback}
         </AvatarFallback>
       </Avatar>

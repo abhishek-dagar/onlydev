@@ -138,6 +138,20 @@ export const SelectionTools = memo(
       },
       [selection, layers, setLastUsedValues]
     );
+    const setStokeStyle = useCallback(
+      (strokeStyle: "solid" | "dashed" | "dotted" | undefined) => {
+        const liveLayers = layers;
+        setLastUsedValues((prev: any) => ({ ...prev, strokeStyle }) as any);
+        selection.forEach((layerId) => {
+          if (
+            liveLayers[layerId].type !== LayerType.Text &&
+            liveLayers[layerId].type !== LayerType.Note
+          )
+            updateLayers(layerId, { ...liveLayers[layerId], strokeStyle });
+        });
+      },
+      [selection, layers, setLastUsedValues]
+    );
 
     const updateLastUsedValues = useCallback(
       (key: string, fill: Color | string) => {
@@ -180,6 +194,31 @@ export const SelectionTools = memo(
     }, [myPresence, myPresence.selectedLayers]);
     if (!selectionBounds) return null;
 
+    const checkStrokeStyle = (
+      value: "solid" | "dashed" | "dotted" | undefined
+    ) => {
+      const layer = layers[myPresence.selectedLayers[0]];
+      if (
+        layer.type === LayerType.Ellipse ||
+        layer.type === LayerType.Rectangle
+      ) {
+        return layer.strokeStyle === value;
+      }
+      return false;
+    };
+    const checkStrokeWidth = (
+      value: number
+    ) => {
+      const layer = layers[myPresence.selectedLayers[0]];
+      if (
+        layer.type === LayerType.Ellipse ||
+        layer.type === LayerType.Rectangle
+      ) {
+        return layer.strokeWidth === value;
+      }
+      return false;
+    };
+
     // const x = selectionBounds.width / 2 + selectionBounds.x + camera.x;
     // const y = selectionBounds.y + camera.y;
     return (
@@ -221,19 +260,54 @@ export const SelectionTools = memo(
             layers[layerId].type !== LayerType.Ellipse &&
             layers[layerId].type !== LayerType.Rectangle
         ).length === 0 && (
-          <Wrapper title="stroke width">
-            <div className="flex gap-2">
-              <ActionButton tooltip="1" onClick={() => setStokeWidth(1)}>
-                1
-              </ActionButton>
-              <ActionButton tooltip="5" onClick={() => setStokeWidth(5)}>
-                5
-              </ActionButton>
-              <ActionButton tooltip="10" onClick={() => setStokeWidth(10)}>
-                10
-              </ActionButton>
-            </div>
-          </Wrapper>
+          <>
+            <Wrapper title="stroke width">
+              <div className="flex gap-2">
+                <ActionButton tooltip="light" onClick={() => setStokeWidth(3)} isActive={checkStrokeWidth(3)}>
+                  <div className="w-2.5 h-0.5 bg-foreground rounded-full" />
+                </ActionButton>
+                <ActionButton tooltip="medium" onClick={() => setStokeWidth(5)} isActive={checkStrokeWidth(5)}>
+                  <div className="w-2.5 h-1 bg-foreground rounded-full" />
+                </ActionButton>
+                <ActionButton tooltip="bold" onClick={() => setStokeWidth(10)} isActive={checkStrokeWidth(10)}>
+                  <div className="w-3 h-1.5 bg-foreground rounded-full" />
+                </ActionButton>
+              </div>
+            </Wrapper>
+            <Wrapper title="stroke width">
+              <div className="flex gap-2">
+                <ActionButton
+                  tooltip="line"
+                  onClick={() => setStokeStyle("solid")}
+                  isActive={checkStrokeStyle("solid")}
+                >
+                  <div className="w-2.5 h-0.5 bg-foreground rounded-full" />
+                </ActionButton>
+                <ActionButton
+                  tooltip="dot"
+                  onClick={() => setStokeStyle("dotted")}
+                  isActive={checkStrokeStyle("dotted")}
+                >
+                  <div className="flex gap-0.5">
+                    <div className="w-0.5 h-0.5 bg-foreground rounded-full" />
+                    <div className="w-0.5 h-0.5 bg-foreground rounded-full" />
+                    <div className="w-0.5 h-0.5 bg-foreground rounded-full" />
+                  </div>
+                </ActionButton>
+                <ActionButton
+                  tooltip="dash"
+                  onClick={() => setStokeStyle("dashed")}
+                  isActive={checkStrokeStyle("dashed")}
+                >
+                  <div className="flex gap-0.5">
+                    <div className="w-1 h-0.5 bg-foreground rounded-full" />
+                    <div className="w-1 h-0.5 bg-foreground rounded-full" />
+                    <div className="w-1 h-0.5 bg-foreground rounded-full" />
+                  </div>
+                </ActionButton>
+              </div>
+            </Wrapper>
+          </>
         )}
 
         {myPresence.selectedLayers.length === 1 &&
@@ -291,7 +365,7 @@ const Wrapper = ({
 }) => {
   return (
     <div className="flex flex-col gap-y-2">
-      <p className="text-sm text-muted-foreground capitalize">{title}</p>
+      <p className="text-xs text-foreground capitalize">{title}</p>
       {children}
     </div>
   );

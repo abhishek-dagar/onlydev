@@ -31,6 +31,12 @@ export const Ellipse = ({
       rx={width / 2}
       ry={height / 2}
       strokeWidth={layer.strokeWidth || 1}
+      strokeDasharray={
+        layer.strokeStyle === "solid"
+          ? undefined
+          : `${layer.strokeStyle === "dashed" ? "7" : "2"} ${layer.strokeWidth === 3 ? "10" : layer.strokeWidth === 5 ? "15" : "20"}`
+      }
+      strokeLinecap="round"
       fill={
         fill ? (typeof fill === "string" ? fill : colorToCss(fill)) : "#000"
       }

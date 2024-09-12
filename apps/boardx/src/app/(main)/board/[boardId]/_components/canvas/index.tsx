@@ -60,11 +60,13 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     strokeColor: Color | string;
     strokeWidth: number;
     textColor: Color | string;
+    strokeStyle: "solid" | "dashed" | "dotted";
     rx: number;
   }>({
     fillColor: "#ffffff",
     strokeColor: "#ffffff",
-    strokeWidth: 1,
+    strokeWidth: 3,
+    strokeStyle: "solid",
     rx: 5,
     textColor: theme?.includes("dark") ? "#ffffff" : "#000",
   });
@@ -176,6 +178,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         userId: user.id,
         ...data,
       };
+
       socket?.emit("update-board", liveBoardData);
     },
     [layerIds, layers, myPresence, camera, cursors, boardId, user.id, socket]
@@ -194,6 +197,20 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     setLayerIds(
       Array.from({ length: board.layers.length }, (_, i) => (i + 1).toString())
     );
+    const lastLayer: any = board.layers[board.layers.length - 1];
+    if (lastLayer) {
+      console.log(lastLayer);
+
+      setLastUsedValues((prev) => ({
+        ...prev,
+        fillColor: lastLayer.fill || prev.fillColor,
+        strokeColor: lastLayer.stroke || prev.strokeColor,
+        strokeWidth: lastLayer.strokeWidth || prev.strokeWidth,
+        strokeStyle: lastLayer.strokeStyle || prev.strokeStyle,
+        rx: lastLayer.rx || prev.rx,
+        textColor: lastLayer.textColor || prev.textColor,
+      }));
+    }
   }, []);
 
   const updateDBboardLayers = async (
@@ -398,6 +415,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         height: 100,
         width: 100,
         fill: lastUsedValues.fillColor,
+        strokeStyle: lastUsedValues.strokeStyle,
         textColor:
           layerType === LayerType.Note
             ? lastUsedValues.fillColor === "#ffffff"
@@ -530,6 +548,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         rx: lastUsedValues.rx,
         stroke: lastUsedValues.strokeColor,
         strokeWidth: lastUsedValues.strokeWidth,
+        strokeStyle: lastUsedValues.strokeStyle,
         height: 0,
         width: 0,
         fill: lastUsedValues.fillColor,
@@ -676,7 +695,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         };
       });
     },
-    [camera, canvasState, cursors]
+    [camera, canvasState, cursors, pencilDraft]
   );
 
   const onResizeHandlePointerDown = useCallback(
@@ -768,7 +787,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
         duplicateLayer={duplicateLayer}
       />
       <svg
-        className="h-[100vh] w-screen"
+        className="h-screen w-screen"
         onWheel={onWheel}
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
@@ -786,7 +805,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
               id={layerId}
               onLayerPointerDown={onLayerPointerDown}
               selectionColor={"#ffffff"}
-              layers={layers}
+              layer={layers[layerId]}
               updateLayers={updateLayers}
             />
           ))}
@@ -815,7 +834,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
               id={"0"}
               onLayerPointerDown={() => {}}
               selectionColor={"#ffffff"}
-              layers={{ "0": tempLayer }}
+              layer={tempLayer}
               updateLayers={() => {}}
             />
           )}
