@@ -850,7 +850,11 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
               points={pencilDraft}
               fill={
                 typeof lastUsedValues.fillColor === "string"
-                  ? lastUsedValues.fillColor
+                  ? lastUsedValues.fillColor === "transparent"
+                    ? theme?.includes("dark")
+                      ? "#ffffff"
+                      : "#000"
+                    : lastUsedValues.fillColor
                   : colorToCss(lastUsedValues.fillColor)
               }
               x={0}
