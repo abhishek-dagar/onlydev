@@ -35,12 +35,13 @@ export const Toolbar = ({
   canRedo,
 }: ToolbarProps) => {
   return (
-    <div className="absolute left-[50%] -translate-x-[50%] bottom-2 flex gap-x-4">
+    <div className="absolute left-[50%] -translate-x-[50%] bottom-16 md:bottom-2 flex gap-x-4">
       <div className="bg-muted rounded-md p-1.5 flex gap-x-4 items-center shadow-md">
         <ToolButton
           label="select"
           icon={HandIcon}
           onClick={() => setCanvasState({ mode: CanvasMode.Grabbing })}
+          isDisabled
           isActive={
             canvasState.mode === CanvasMode.Grabbing
           }

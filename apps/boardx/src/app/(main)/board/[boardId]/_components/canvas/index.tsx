@@ -611,7 +611,14 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     // trackHistory();
     setLayers((prev) => ({
       ...prev,
-      [layerId]: penPointsToPathLayer(pencilDraft, lastUsedValues.fillColor),
+      [layerId]: penPointsToPathLayer(
+        pencilDraft,
+        lastUsedValues.fillColor === "transparent"
+          ? theme?.includes("dark")
+            ? "#ffffff"
+            : "#000"
+          : lastUsedValues.fillColor
+      ),
     }));
     setPencilDraft(null);
     updateLiveBoardData({
@@ -748,7 +755,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   return (
     <main
       className={cn(
-        "h-full w-full relative touch-none",
+        "h-screen w-screen relative touch-none",
         {
           "cursor-crosshair":
             canvasState.mode === CanvasMode.Inserting &&
