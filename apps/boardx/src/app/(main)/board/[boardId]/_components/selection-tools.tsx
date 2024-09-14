@@ -158,7 +158,7 @@ export const SelectionTools = memo(
         const liveLayers = layers;
         setLastUsedValues((prev: any) => ({ ...prev, [key]: fill }) as any);
         selection.forEach((layerId) => {
-          updateLayers(layerId, { ...liveLayers[layerId], fill });
+          updateLayers(layerId, { ...liveLayers[layerId], [key]:fill });
         });
       },
       [selection, layers, setLastUsedValues]

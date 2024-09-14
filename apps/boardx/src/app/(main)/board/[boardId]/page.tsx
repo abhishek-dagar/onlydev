@@ -3,6 +3,7 @@ import Canvas from "./_components/canvas";
 import { currentUser } from "@repo/ui/lib/helpers/getTokenData";
 import { redirect } from "next/navigation";
 import { fetchBoardById } from "@/lib/actions/board.action";
+// import Canvas from "./_components/new-canvas";
 
 const BoardPage = async ({ params }: { params: { boardId: string } }) => {
   const user = await currentUser();
@@ -12,6 +13,7 @@ const BoardPage = async ({ params }: { params: { boardId: string } }) => {
   return (
     <div className="h-screen w-screen">
       <Canvas boardId={params.boardId} board={board} user={user} />
+      {/* <Canvas /> */}
     </div>
   );
 };

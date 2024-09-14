@@ -75,6 +75,7 @@ export enum Side {
 export type CanvasState =
   | {
       mode: CanvasMode.Grabbing;
+      current?: Point;
     }
   | {
       mode: CanvasMode.None;
@@ -110,8 +111,8 @@ export type CanvasState =
     };
 
 export enum CanvasMode {
-  None,
   Grabbing,
+  None,
   Pressing,
   SelectionNet,
   Translating,

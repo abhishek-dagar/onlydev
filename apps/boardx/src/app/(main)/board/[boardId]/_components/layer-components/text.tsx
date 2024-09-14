@@ -18,7 +18,6 @@ const calculateFontSize = (width: number, height: number) => {
   // Avoid zero or negative sizes
   const fontSizeBasedOnHeight = Math.max(1, height * scaleFactor);
   const fontSizeBasedOnWidth = Math.max(1, width * scaleFactor);
-  
 
   return Math.min(fontSizeBasedOnHeight, fontSizeBasedOnWidth, maxFontSize);
 };
@@ -74,10 +73,10 @@ export const Text = ({
         )}
         style={{
           fontSize: calculateFontSize(layer.width, layer.height),
-          color: layer.fill
-            ? typeof layer.fill === "string"
-              ? layer.fill
-              : colorToCss(layer.fill)
+          color: layer.textColor
+            ? typeof layer.textColor === "string"
+              ? layer.textColor
+              : colorToCss(layer.textColor)
             : "var(--muted-foreground)",
           overflow: "hidden",
           border: "none",

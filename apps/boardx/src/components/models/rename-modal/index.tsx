@@ -21,10 +21,12 @@ const RenameModal = forwardRef(
     {
       board,
       updateBoardData,
+      className,
       children,
     }: {
       board: BoardType;
       children?: React.ReactNode;
+      className?: string;
       updateBoardData: (data: BoardType) => void;
     },
     _
@@ -44,7 +46,7 @@ const RenameModal = forwardRef(
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         {children ? (
-          <DialogTrigger asChild>{children}</DialogTrigger>
+          <DialogTrigger className={className} asChild>{children}</DialogTrigger>
         ) : (
           <DialogTrigger className="inline-flex items-center whitespace-nowrap rounded-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 p-3 cursor-pointer text-sm w-full justify-start font-normal">
             <PencilIcon className="h-4 w-4 mr-2" />

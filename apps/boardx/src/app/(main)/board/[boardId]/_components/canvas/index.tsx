@@ -55,6 +55,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
   });
   const [layerIds, setLayerIds] = useState<string[]>([]);
   const [layers, setLayers] = useState<{ [key: string]: Layer }>({});
+  const [isDragging, setIsDragging] = useState<boolean>(false);
   const [lastUsedValues, setLastUsedValues] = useState<{
     fillColor: Color | string;
     strokeColor: Color | string;
@@ -199,8 +200,6 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     );
     const lastLayer: any = board.layers[board.layers.length - 1];
     if (lastLayer) {
-      console.log(lastLayer);
-
       setLastUsedValues((prev) => ({
         ...prev,
         fillColor: lastLayer.fill || prev.fillColor,
@@ -596,6 +595,29 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     [canvasState, tempLayer]
   );
 
+  const startDragging = useCallback(
+    (point: Point) => {
+      if (canvasState.mode !== CanvasMode.Grabbing) return;
+      setIsDragging(true);
+      setCanvasState({ mode: CanvasMode.Grabbing, current: point });
+      // continueDrawing(e);
+    },
+    [canvasState]
+  );
+  const handleDragging = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging || canvasState.mode !== CanvasMode.Grabbing) return;
+
+      // Calculate the offset (drag distance) between the new point and the previous drag point
+      const offsetX = e.clientX - canvasState.current!.x;
+      const offsetY = e.clientY - canvasState.current!.y;
+
+      // Update the camera position by applying the offset
+      setCamera({ x: offsetX, y: offsetY });
+    },
+    [isDragging, canvasState]
+  );
+
   const insertPath = useCallback(() => {
     // const liveLayers = layers;
     if (
@@ -651,6 +673,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     (e: React.PointerEvent) => {
       const point = pointerEventToCanvasPoint(e, camera);
       if (canvasState.mode === CanvasMode.Grabbing) {
+        startDragging(point);
         return;
       }
       if (canvasState.mode === CanvasMode.Inserting) {
@@ -680,7 +703,9 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     (e: React.PointerEvent) => {
       const current = pointerEventToCanvasPoint(e, camera);
 
-      if (canvasState.mode === CanvasMode.Pressing) {
+      if (canvasState.mode === CanvasMode.Grabbing) {
+        handleDragging(e);
+      } else if (canvasState.mode === CanvasMode.Pressing) {
         startMultiSelection(current, canvasState.origin);
       } else if (canvasState.mode === CanvasMode.SelectionNet) {
         updateSelectionNet(current, canvasState.origin);
@@ -716,6 +741,7 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
     async (e: React.PointerEvent) => {
       const point = pointerEventToCanvasPoint(e, camera);
       if (canvasState.mode === CanvasMode.Grabbing) {
+        setIsDragging(false);
         return;
       } else if (
         canvasState.mode === CanvasMode.None ||
@@ -762,8 +788,14 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
             (canvasState.layerType === LayerType.Rectangle ||
               canvasState.layerType === LayerType.Ellipse),
         },
+        { "cursor-grab": canvasState.mode === CanvasMode.Grabbing },
         {
-          "cursor-grab": canvasState.mode === CanvasMode.Grabbing,
+          "cursor-grabbing":
+            canvasState.mode === CanvasMode.Grabbing && isDragging,
+        },
+        {
+          "cursor-move":
+            canvasState.mode === CanvasMode.Translating,
         }
       )}
     >
@@ -810,7 +842,11 @@ const Canvas = ({ boardId, board, user }: CanvasProps) => {
             <LayerPreview
               key={index}
               id={layerId}
-              onLayerPointerDown={onLayerPointerDown}
+              onLayerPointerDown={
+                canvasState.mode === CanvasMode.Grabbing
+                  ? () => {}
+                  : onLayerPointerDown
+              }
               selectionColor={"#ffffff"}
               layer={layers[layerId]}
               updateLayers={updateLayers}
