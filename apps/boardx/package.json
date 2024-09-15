@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.17.6",
     "@repo/db": "*",
     "@repo/ui": "*",
     "axios": "^1.7.7",

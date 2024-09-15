@@ -1,8 +1,9 @@
 import React from "react";
-import Canvas from "./_components/canvas";
+// import Canvas from "./_components/canvas";
 import { currentUser } from "@repo/ui/lib/helpers/getTokenData";
 import { redirect } from "next/navigation";
 import { fetchBoardById } from "@/lib/actions/board.action";
+import Board from "./_components/board";
 // import Canvas from "./_components/new-canvas";
 
 const BoardPage = async ({ params }: { params: { boardId: string } }) => {
@@ -12,8 +13,8 @@ const BoardPage = async ({ params }: { params: { boardId: string } }) => {
   if (!board) redirect("/app/dashboard");
   return (
     <div className="h-screen w-screen">
-      <Canvas boardId={params.boardId} board={board} user={user} />
-      {/* <Canvas /> */}
+      {/* <Canvas boardId={params.boardId} board={board} user={user} /> */}
+      <Board board={board} user={user}/>
     </div>
   );
 };

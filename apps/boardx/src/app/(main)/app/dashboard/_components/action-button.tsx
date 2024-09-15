@@ -48,22 +48,6 @@ const ActionButton = ({
   handleDelete,
   updateBoardData,
 }: ActionsProps) => {
-  const { setTheme, theme } = useTheme();
-  const [isLight, setIsLight] = React.useState<boolean | undefined>(false);
-
-  const handleThemeChange = (newMode: string, colorVariant?: string) => {
-    const themeArray = theme?.split("-") || ["light"]; // Default to light if theme is undefined
-    themeArray[0] = newMode; // Change the first part of the theme (mode: light or dark)
-    if (colorVariant) themeArray[1] = colorVariant;
-    console.log(themeArray.join("-"));
-
-    setTheme(themeArray.join("-")); // Update theme preserving any additional variants
-  };
-
-  React.useEffect(() => {
-    setIsLight(theme?.includes("light"));
-  }, [theme]);
-
   const onCopyLink = () => {
     navigator.clipboard
       .writeText(`${window.location.origin}/board/${id}`)
@@ -124,32 +108,6 @@ const ActionButton = ({
             <span>Delete</span>
           </DropdownMenuItem>
         </DeleteConfirmModal>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="p-2 text-xs text-foreground/70 focus:bg-transparent">
-          <span>Theme</span>
-          <DropdownMenuShortcut className="opacity-100 border rounded-md">
-            <Button
-              variant={"ghost"}
-              size={"icon"}
-              className={cn("h-7 w-10", {
-                "bg-primary text-white": isLight,
-              })}
-              onClick={() => handleThemeChange("light")}
-            >
-              <SunIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={"ghost"}
-              size={"icon"}
-              className={cn("h-7 w-10", {
-                "bg-primary text-white": !isLight,
-              })}
-              onClick={() => handleThemeChange("dark", "violet")}
-            >
-              <MoonIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -28,13 +28,13 @@ export const Cursor = memo(({ userId, cursor, index }: CursorProps) => {
   if (!cursor) return null;
   const { x, y } = cursor;
   return (
-    <foreignObject
+    <div
       style={{
         transform: `translateX(${x}px) translateY(${y}px)`,
+        height: "0px",
+        // width: `${name.length * 10 + 24}px`,
       }}
-      height={50}
-      width={name.length * 10 + 24}
-      className="relative drop-shadow-md"
+      className="relative drop-shadow-md z-[99999]"
     >
       <MousePointer2Icon
         className="h-5 w-5"
@@ -51,7 +51,31 @@ export const Cursor = memo(({ userId, cursor, index }: CursorProps) => {
       >
         {name}
       </div>
-    </foreignObject>
+    </div>
+    // <foreignObject
+    //   style={{
+    //     transform: `translateX(${x}px) translateY(${y}px)`,
+    //   }}
+    //   height={50}
+    //   width={name.length * 10 + 24}
+    //   className="relative drop-shadow-md"
+    // >
+    //   <MousePointer2Icon
+    //     className="h-5 w-5"
+    //     style={{
+    //       fill: connectionIdToColor(index),
+    //       color: connectionIdToColor(index),
+    //     }}
+    //   />
+    //   <div
+    //     className="absolute left-5 px-1.5 py-0.5 rounded-md text-xs text-white font-semibold"
+    //     style={{
+    //       backgroundColor: connectionIdToColor(index),
+    //     }}
+    //   >
+    //     {name}
+    //   </div>
+    // </foreignObject>
   );
 });
 

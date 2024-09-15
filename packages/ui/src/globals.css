@@ -44,6 +44,7 @@
       background: #bebfc1;
       border-radius: 100px;
     }
+    scroll-behavior: smooth;
   }
 
   html[class*="dark-violet"] {
