@@ -1,6 +1,7 @@
 "use client";
 import CursorTracker from "@/components/common/cursor-div";
 import DivSlider from "@/components/common/div-slider";
+import BgIcon from "@/components/icons/bg-icon";
 import { motion } from "framer-motion";
 import {
   ArrowUpRightIcon,
@@ -17,15 +18,18 @@ export default function Home() {
     <div className="relative overflow-hidden">
       <DivSlider />
       <CursorTracker />
-      <main>
+      {/* <main> */}
         <div className="h-screen w-screen overflow-x-hidden">
-          <nav className="h-20 w-full border-b absolute top-0 right-0 z-[100] bg-background">
-            <ul>
+          <nav className="h-20 w-full border-b absolute top-0 right-0 z-[100] bg-background flex justify-center items-center">
+            <ul className="flex gap-8 uppercase">
               <Link href="#home">
                 <li>Home</li>
               </Link>
               <Link href="#services">
                 <li>services</li>
+              </Link>
+              <Link href="#about">
+                <li>About</li>
               </Link>
             </ul>
           </nav>
@@ -36,8 +40,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: DELAY }}
             className="h-full w-full bg-background after:absolute after:inset-0 after:z-10 after:-bottom-96 after:[background:linear-gradient(to_top,rgb(var(--background))_30%,transparent)] overflow-hidden relative"
             style={{
-              backgroundImage:
-                "url('https://infolio-nextjs.vercel.app/light/assets/imgs/patterns/lines1.png')",
+              backgroundImage: "url('/lines1.png')",
               backgroundSize: "cover",
               backgroundPosition: "center top",
               opacity: 0.2,
@@ -50,7 +53,7 @@ export default function Home() {
               </h1>
             </div>
           </motion.section>
-          <section id="services" className="pt-[140px] px-20">
+          <section id="services" className="pt-[140px] px-10 md:px-20">
             <div className="flex flex-col gap-8 mb-20">
               <h6 className="text-sm uppercase font-semibold">
                 Our Specialize
@@ -72,12 +75,7 @@ export default function Home() {
                 </p>
                 <p className="flex gap-4">
                   <span>Read Mode</span>{" "}
-                  <img
-                    src="https://infolio-nextjs.vercel.app/light/assets/imgs/arrow-right.png"
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
+                  <img src="/arrow-right.png" alt="" width={20} height={20} />
                 </p>
               </div>
               <div className="border rounded-xl p-10 flex flex-col gap-8">
@@ -89,21 +87,16 @@ export default function Home() {
                 </p>
                 <p className="flex gap-4">
                   <span>Read Mode</span>{" "}
-                  <img
-                    src="https://infolio-nextjs.vercel.app/light/assets/imgs/arrow-right.png"
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
+                  <img src="/arrow-right.png" alt="" width={20} height={20} />
                 </p>
               </div>
             </div>
           </section>
-          <section id="about" className="pt-[140px] px-20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex gap-4 items-center">
-                <p className="flex flex-col items-start text-2xl w-[120px]">
-                  <span>2</span>{" "}
+          <section id="about" className="pt-[140px] px-10 md:px-20">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div className="flex gap-4 items-center justify-center relative text-muted-foreground">
+                <p className="flex flex-col items-start text-5xl w-[120px]">
+                  <span className="text-[#2abf8f] font-bold">2</span>
                   <span className="text-xl">years of experience</span>
                 </p>
                 <Image
@@ -113,19 +106,42 @@ export default function Home() {
                   height={300}
                   className="rounded-xl"
                 />
+                <div className="absolute -top-0 left-0 h-1/2 w-1/2 -z-10">
+                  <BgIcon />
+                </div>
               </div>
 
               <div className="py-4 flex flex-col gap-8">
-                <h2 className="text-xl">About Me</h2>
-                <h3 className="text-3xl font-semibold">Software Engineer</h3>
-                <p>
+                <h2 className="text-xl uppercase">About Me</h2>
+                <h3 className="text-3xl font-semibold leading-6">
+                  Software Engineer
+                </h3>
+                <p className="border-b pb-10">
                   We shifted our talents to frontier science because we wanted
                   our work to have tangible, human-positive impact.
                 </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <p>
+                    <strong>Name: </strong> Abhishek Dagar
+                  </p>
+                  <p>
+                    <strong>Phone: </strong> +91 96435-01840
+                  </p>
+                  <p>
+                    <strong>Email: </strong> dagarabhishek584@gmail.com
+                  </p>
+                </div>
+                <Link
+                  href={"/resume.pdf"}
+                  target="_blank"
+                  className="bg-[#2abf8f] w-[150px] text-center p-3 rounded-full"
+                >
+                  Download CV
+                </Link>
               </div>
             </div>
           </section>
-          <section id="about" className="pt-[140px] px-20">
+          <section className="pt-[140px] px-10 md:px-20">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="py-4 flex flex-col gap-8">
                 <h2 className="text-xl">About Me</h2>
@@ -139,7 +155,7 @@ export default function Home() {
           </section>
         </div>
         {/* <div className="h-10 bg-transparent" /> */}
-      </main>
+      {/* </main> */}
     </div>
   );
 }
