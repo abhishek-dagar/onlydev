@@ -4,3 +4,10 @@
 .ToolIcon_type_checkbox {
   display: none !important;
 }
+.custom-styles .excalidraw {
+  --color-primary:rgb(var(--primary));
+}
+
+.custom-styles .excalidraw.theme--dark {
+  --color-primary: rgb(var(--primary));
+}

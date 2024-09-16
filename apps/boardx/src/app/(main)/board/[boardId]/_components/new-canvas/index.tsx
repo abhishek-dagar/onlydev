@@ -16,6 +16,7 @@ import {
   LockKeyholeOpenIcon,
   MoonIcon,
   SunIcon,
+  XCircleIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useState, useEffect, useCallback } from "react";
@@ -24,6 +25,9 @@ import { Point } from "@repo/ui/lib/types/canvas.type";
 import "./index.css";
 import { updateBoard } from "@/lib/actions/board.action";
 import { Switch } from "@repo/ui/components/ui/switch";
+import useKeyPress from "@repo/ui/hooks/use-key-pressed/index";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface ExcalidrawWrapperProps {
   board: BoardType;
@@ -38,14 +42,17 @@ const ExcalidrawWrapper = ({
 }: ExcalidrawWrapperProps) => {
   const [isLight, setIsLight] = useState<boolean | undefined>(false);
   const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI>();
-  const [isButtonDown, setIsButtonDown] = useState(false);
+  // const [isButtonDown, setIsButtonDown] = useState(false);
   const [elements, setElements] = useState<readonly ExcalidrawElement[]>([]);
   const [cursors, setCursors] = useState<Record<string, Point>>({});
   const [tabs, setTabs] = useState("note");
   const [panelSize, setPanelSize] = useState([50, 50]);
 
+  const { keysPressed } = useKeyPress();
+
   const { theme, setTheme } = useTheme();
   const { socket } = useSocket();
+  const router = useRouter();
 
   const handleThemeChange = (newMode: string, colorVariant?: string) => {
     const themeArray = theme?.split("-") || ["light"]; // Default to light if theme is undefined
@@ -70,10 +77,10 @@ const ExcalidrawWrapper = ({
   // Send updates to the server when elements change
   const handleElementsChange = useCallback(
     (data: { elements: readonly ExcalidrawElement[]; appState?: AppState }) => {
-      if (!isButtonDown) return;
+      // if (!isButtonDown) return;
       setElements(data.elements);
     },
-    [isButtonDown]
+    []
   );
 
   const handleLiveBoardData = useCallback(
@@ -82,7 +89,7 @@ const ExcalidrawWrapper = ({
         cursors,
         roomId: board.id,
         userId: user.id,
-        elements: elements,
+        elements,
         ...data,
       };
       socket?.emit("update-board", liveBoardData);
@@ -93,7 +100,7 @@ const ExcalidrawWrapper = ({
   const updateDBboardLayers = async (
     elements: readonly ExcalidrawElement[]
   ) => {
-    const res = await updateBoard({
+    await updateBoard({
       id: board.id,
       layers: elements,
     });
@@ -103,6 +110,14 @@ const ExcalidrawWrapper = ({
     // console.log(board.layers);
     setElements(board.layers as any);
   }, []);
+
+  useEffect(() => {
+    if (keysPressed.length > 1 && board) {
+      if (keysPressed[0] === "Alt" && keysPressed[1] === "x") {
+        router.push(`/app/dashboard?workspaceId=${board.boardWorkspaceId}`);
+      }
+    }
+  }, [keysPressed, board]);
 
   useEffect(() => {
     setIsLight(theme?.includes("light"));
@@ -133,7 +148,7 @@ const ExcalidrawWrapper = ({
   }, [socket, excalidrawAPI, board.id, user.id]);
 
   const onPointerUp = useCallback(() => {
-    setIsButtonDown(false);
+    // setIsButtonDown(false);
     if (excalidrawAPI) {
       updateDBboardLayers(excalidrawAPI.getSceneElements());
       setElements(excalidrawAPI.getSceneElements());
@@ -156,7 +171,7 @@ const ExcalidrawWrapper = ({
   );
 
   const onPointerLeave = useCallback(() => {
-    setIsButtonDown(false);
+    // setIsButtonDown(false);
     const updatedCursors = JSON.parse(JSON.stringify(cursors));
     delete updatedCursors[user.id];
     setCursors(updatedCursors);
@@ -181,7 +196,7 @@ const ExcalidrawWrapper = ({
   return (
     <div
       className="h-screen w-screen overflow-hidden relative"
-      onPointerDown={() => setIsButtonDown(true)}
+      // onPointerDown={() => setIsButtonDown(true)}
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
       onPointerUp={onPointerUp}
@@ -217,6 +232,7 @@ const ExcalidrawWrapper = ({
           excalidrawAPI={(api) => {
             setExcalidrawAPI(api);
           }}
+          name={board.name}
           onChange={(elements, appState) => {
             handleElementsChange({ elements, appState });
           }}
@@ -227,6 +243,18 @@ const ExcalidrawWrapper = ({
             <MainMenu.DefaultItems.Export />
             <MainMenu.DefaultItems.SaveAsImage />
             <MainMenu.DefaultItems.ClearCanvas />
+            <MainMenu.ItemCustom className="!mt-0 !p-0">
+              <Link
+                href={`/app/dashboard?workspaceId=${board.boardWorkspaceId}`}
+                className="dropdown-menu-item dropdown-menu-item-base"
+              >
+                <div className="dropdown-menu-item__icon">
+                  <XCircleIcon />
+                </div>
+                <div className="dropdown-menu-item__text">Close</div>
+                <div className="dropdown-menu-item__shortcut">Alt+x</div>
+              </Link>
+            </MainMenu.ItemCustom>
             <MainMenu.Separator />
             <MainMenu.ItemCustom className="flex items-center justify-between">
               <p className="flex items-center">

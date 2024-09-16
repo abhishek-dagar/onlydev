@@ -40,8 +40,8 @@ const BoardCard = ({
             handleDelete={deleteBoard}
             updateBoardData={updateBoardData}
           >
-            <button className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 px-3 py-2 outline-none">
-              <MoreHorizontalIcon className="text-white opacity-75 hover:opacity-100 transition-opacity" />
+            <button className="absolute top-1 right-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 px-3 py-2 outline-none">
+              <MoreHorizontalIcon className="text-white md:opacity-75 hover:opacity-100 transition-opacity" />
             </button>
           </ActionButton>
         </div>

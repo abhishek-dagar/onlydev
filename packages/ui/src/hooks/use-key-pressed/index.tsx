@@ -31,7 +31,7 @@ const useKeyPress = () => {
     };
   }, []);
 
-  return [Array.from(keysPressed),handleSetKeyPressed];
+  return { keysPressed: Array.from(keysPressed),setKeys:handleSetKeyPressed};
 };
 
 export default useKeyPress;
