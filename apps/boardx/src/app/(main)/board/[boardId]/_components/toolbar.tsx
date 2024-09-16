@@ -35,12 +35,12 @@ export const Toolbar = ({
   canUndo,
   canRedo,
 }: ToolbarProps) => {
-  const [key, setKeyPressed] = useKeyPress();
+  const {keysPressed, setKeys} = useKeyPress();
 
   useEffect(() => {
     const isNumber = (str: string): boolean =>
       !isNaN(parseFloat(str)) && isFinite(Number(str));
-    const keyArray = key as string[];
+    const keyArray = keysPressed as string[];
     if (!isNumber(keyArray[0])) return;
     switch (parseInt(keyArray[0])) {
       case 0:
@@ -82,8 +82,8 @@ export const Toolbar = ({
         setCanvasState({ mode: CanvasMode.None });
         break;
     }
-    (setKeyPressed as (value: Set<string>) => void)(new Set());
-  }, [key]);
+    setKeys(new Set());
+  }, [keysPressed]);
 
   return (
     <div className="absolute left-[50%] -translate-x-[50%] bottom-16 md:bottom-2 flex gap-x-4 z-10">
