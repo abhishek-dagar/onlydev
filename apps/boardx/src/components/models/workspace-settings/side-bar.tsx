@@ -30,7 +30,7 @@ const SideBar = ({
       <Button
         variant={"ghost"}
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute left-3 top-6 items-center gap-2 "
+        className="absolute left-3 top-6 items-center gap-2 hidden md:flex"
       >
         <MenuIcon size={20} /> Menu
       </Button>
